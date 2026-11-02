@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Angry Birds — Ultimate Edition (Final Fix)</title>
+<title>Angry Birds — Ultimate Edition (Final)</title>
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -110,12 +110,13 @@
     </div>
     <div class="menu-screen show" id="menuScreen">
         <div class="menu-title">ANGRY BIRDS</div>
-        <div class="menu-subtitle">Boss Update</div>
+        <div class="menu-subtitle">Ultimate Edition</div>
         <div class="menu-buttons">
             <button class="menu-btn primary" id="playBtn">🎮 Играть</button>
             <button class="menu-btn secondary" id="levelsBtn">🗺️ Уровни</button>
             <button class="menu-btn quaternary" id="achievementsBtn">🏆 Награды</button>
             <button class="menu-btn tertiary" id="menuSoundBtn">🔊 Звук: Вкл</button>
+            <button class="menu-btn" id="creditsBtn" style="background: linear-gradient(180deg, #555, #222); font-size: 16px; padding: 15px;">© Авторы</button>
         </div>
     </div>
     <div class="levels-screen" id="levelsScreen">
@@ -125,6 +126,13 @@
     <div class="levels-screen" id="achievementsScreen" style="z-index: 115;">
         <div class="levels-header"><div class="levels-title">🏆 Награды</div><button class="btn-back" id="achBackBtn">← Назад</button></div>
         <div class="levels-grid" id="achievementsGrid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));"></div>
+    </div>
+    <div class="levels-screen" id="creditsScreen" style="z-index: 115; justify-content: center;">
+        <div class="levels-title" style="margin-bottom: 20px;">Создатели</div>
+        <div style="color: white; font-size: 24px; line-height: 2; text-align: center; font-weight: bold;">
+            RedDarkWoid<br>DeepSeek<br>Лекс
+        </div>
+        <button class="btn btn-play" style="margin-top: 40px;" id="creditsBackBtn">Назад</button>
     </div>
 </div>
 <script>
@@ -140,8 +148,9 @@ const overlay = $('overlay'), overlayTitle = $('overlayTitle'), overlayStars = $
 const playAgainBtn = $('playAgainBtn'), nextLevelBtn = $('nextLevelBtn'), overlayMenuBtn = $('overlayMenuBtn'), restartBtn = $('restartBtn'), menuBtn = $('menuBtn'), soundBtn = $('soundBtn');
 const menuScreen = $('menuScreen'), levelsScreen = $('levelsScreen'), levelsGrid = $('levelsGrid'), playBtn = $('playBtn'), levelsBtn = $('levelsBtn'), menuSoundBtn = $('menuSoundBtn'), backBtn = $('backBtn');
 const achievementsBtn = $('achievementsBtn'), achievementsScreen = $('achievementsScreen'), achievementsGrid = $('achievementsGrid'), achBackBtn = $('achBackBtn');
+const creditsBtn = $('creditsBtn'), creditsScreen = $('creditsScreen'), creditsBackBtn = $('creditsBackBtn');
 
-const SAVE_KEY = 'angryBirds_boss_update';
+const SAVE_KEY = 'angryBirds_ultimate_v16';
 let saveData = { levels: {}, achievements: {}, stats: { birds: 0, pigs: 0, blocks: 0, abilities: 0 } };
 function loadSave() { try { const r = localStorage.getItem(SAVE_KEY); if (r) { saveData = JSON.parse(r); if (!saveData.stats) saveData.stats = { birds: 0, pigs: 0, blocks: 0, abilities: 0 }; } } catch(e) {} }
 function saveGame() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(saveData)); } catch(e) {} }
@@ -149,14 +158,14 @@ function saveGame() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(saveDa
 const ACHIEVEMENTS = {
     firstWin: { icon: '🎯', name: 'Первая победа', desc: 'Пройди 1 уровень', cond: () => Object.keys(saveData.levels).length >= 1 },
     threeStars: { icon: '⭐', name: 'Идеально!', desc: 'Получи 3 звезды', cond: () => Object.values(saveData.levels).some(l => l.stars === 3) },
-    fiveLvls: { icon: '🏆', name: 'Опытный', desc: 'Пройди 5 уровней', cond: () => Object.keys(saveData.levels).length >= 5 },
-    allLvls: { icon: '👑', name: 'Мастер', desc: 'Пройди все 18 уровней', cond: () => Object.keys(saveData.levels).length >= 18 },
-    pig50: { icon: '🐷', name: 'Охотник', desc: 'Убей 50 свиней', cond: () => saveData.stats.pigs >= 50 },
-    pig200: { icon: '💀', name: 'Истребитель', desc: 'Убей 200 свиней', cond: () => saveData.stats.pigs >= 200 },
-    bird100: { icon: '🐦', name: 'Птицелов', desc: 'Запусти 100 птиц', cond: () => saveData.stats.birds >= 100 },
-    block100: { icon: '🪓', name: 'Разрушитель', desc: 'Сломай 100 блоков', cond: () => saveData.stats.blocks >= 100 },
-    ability30: { icon: '⚡', name: 'Мастер силы', desc: 'Используй 30 способностей', cond: () => saveData.stats.abilities >= 30 },
-    allStars: { icon: '🌟', name: 'Перфекционист', desc: 'Собери 45 звёзд', cond: () => { let t=0; Object.values(saveData.levels).forEach(l=>t+=l.stars||0); return t>=45; } }
+    tenLvls: { icon: '🏆', name: 'Опытный', desc: 'Пройди 10 уровней', cond: () => Object.keys(saveData.levels).length >= 10 },
+    allLvls: { icon: '👑', name: 'Мастер', desc: 'Пройди все 25 уровней', cond: () => Object.keys(saveData.levels).length >= 25 },
+    pig100: { icon: '🐷', name: 'Охотник', desc: 'Убей 100 свиней', cond: () => saveData.stats.pigs >= 100 },
+    pig300: { icon: '💀', name: 'Истребитель', desc: 'Убей 300 свиней', cond: () => saveData.stats.pigs >= 300 },
+    bird200: { icon: '🐦', name: 'Птицелов', desc: 'Запусти 200 птиц', cond: () => saveData.stats.birds >= 200 },
+    block300: { icon: '🪓', name: 'Разрушитель', desc: 'Сломай 300 блоков', cond: () => saveData.stats.blocks >= 300 },
+    ability50: { icon: '⚡', name: 'Мастер силы', desc: 'Используй 50 способностей', cond: () => saveData.stats.abilities >= 50 },
+    allStars: { icon: '🌟', name: 'Перфекционист', desc: 'Собери 60 звёзд', cond: () => { let t=0; Object.values(saveData.levels).forEach(l=>t+=l.stars||0); return t>=60; } }
 };
 let achQueue = [];
 function checkAchievements() {
@@ -172,10 +181,10 @@ function processAchQueue() {
 }
 
 const BIOMES = {
-    sunset: { skyTop: '#1a2151', skyMid: '#3d4d8c', skyBot: '#ffd89b', ground1: '#7bc043', ground2: '#3f7a22', mountain: 'rgba(60,50,110,0.55)' },
-    desert: { skyTop: '#f6d365', skyMid: '#fda085', skyBot: '#ffedbc', ground1: '#f0c27b', ground2: '#9c6b3e', mountain: 'rgba(180,120,80,0.5)' },
-    night:  { skyTop: '#0f0c29', skyMid: '#302b63', skyBot: '#24243e', ground1: '#2d5a27', ground2: '#1a3a15', mountain: 'rgba(20,15,50,0.8)' },
-    ice:    { skyTop: '#83a4d4', skyMid: '#b6fbff', skyBot: '#ffffff', ground1: '#e0f7fa', ground2: '#80deea', mountain: 'rgba(150,180,200,0.5)' }
+    sunset: { name: 'Утро', skyTop: '#1a2151', skyMid: '#3d4d8c', skyBot: '#ffd89b', ground1: '#7bc043', ground2: '#3f7a22', mountain: 'rgba(60,50,110,0.55)' },
+    desert: { name: 'Пустыня', skyTop: '#f6d365', skyMid: '#fda085', skyBot: '#ffedbc', ground1: '#f0c27b', ground2: '#9c6b3e', mountain: 'rgba(180,120,80,0.5)' },
+    night:  { name: 'Ночь', skyTop: '#0f0c29', skyMid: '#302b63', skyBot: '#24243e', ground1: '#2d5a27', ground2: '#1a3a15', mountain: 'rgba(20,15,50,0.8)' },
+    ice:    { name: 'Зима', skyTop: '#83a4d4', skyMid: '#b6fbff', skyBot: '#ffffff', ground1: '#e0f7fa', ground2: '#80deea', mountain: 'rgba(150,180,200,0.5)' }
 };
 
 const GRAVITY = 0.45, AIR = 0.9985, GROUND_Y = H - 78, MAX_PULL = 130, LAUNCH_MULT = 0.20;
@@ -202,7 +211,6 @@ const LEVELS = [
     { name: 'Тёмная башня', biome: 'night', birds: ['yellow', 'blue', 'black', 'red', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 130, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 230, r: 22, type: 'normal' }, { x: 850, y: GROUND_Y - 26, r: 24, type: 'normal' }], blocks: [{ x: 700, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 800, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 690, y: GROUND_Y - 122, w: 145, h: 22, type: 'wood' }, { x: 710, y: GROUND_Y - 200, w: 20, h: 78, type: 'wood' }, { x: 790, y: GROUND_Y - 200, w: 20, h: 78, type: 'wood' }, { x: 700, y: GROUND_Y - 220, w: 120, h: 20, type: 'stone' }, { x: 730, y: GROUND_Y - 290, w: 18, h: 70, type: 'wood' }, { x: 770, y: GROUND_Y - 290, w: 18, h: 70, type: 'wood' }, { x: 720, y: GROUND_Y - 308, w: 80, h: 18, type: 'wood' }] },
     { name: 'Луна', biome: 'night', birds: ['black', 'black', 'yellow', 'red'], pigs: [{ x: 720, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 820, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 920, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 770, y: GROUND_Y - 130, r: 24, type: 'normal' }, { x: 870, y: GROUND_Y - 130, r: 24, type: 'normal' }], blocks: [{ x: 680, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 790, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 900, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 670, y: GROUND_Y - 132, w: 262, h: 22, type: 'stone' }, { x: 720, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' }, { x: 820, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' }, { x: 910, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' }, { x: 710, y: GROUND_Y - 218, w: 230, h: 18, type: 'wood' }] },
     { name: 'Бронированный', biome: 'ice', birds: ['yellow', 'white', 'blue', 'black'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26, type: 'helmet' }, { x: 800, y: GROUND_Y - 150, r: 24, type: 'helmet' }, { x: 800, y: GROUND_Y - 280, r: 22, type: 'helmet' }], blocks: [{ x: 700, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 900, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 690, y: GROUND_Y - 122, w: 220, h: 22, type: 'stone' }, { x: 730, y: GROUND_Y - 200, w: 18, h: 78, type: 'stone' }, { x: 870, y: GROUND_Y - 200, w: 18, h: 78, type: 'stone' }, { x: 720, y: GROUND_Y - 218, w: 180, h: 18, type: 'stone' }, { x: 760, y: GROUND_Y - 300, w: 18, h: 82, type: 'stone' }, { x: 840, y: GROUND_Y - 300, w: 18, h: 82, type: 'stone' }, { x: 750, y: GROUND_Y - 318, w: 120, h: 18, type: 'stone' }] },
-    // УРОВЕНЬ 9 ИСПРАВЛЕН (свиньи не касаются блоков)
     { name: 'Северное сияние', biome: 'ice', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 820, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 890, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 140, r: 24, type: 'normal' }, { x: 820, y: GROUND_Y - 140, r: 22, type: 'normal' }, { x: 890, y: GROUND_Y - 140, r: 22, type: 'normal' }], blocks: [{ x: 700, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 930, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 690, y: GROUND_Y - 145, w: 276, h: 25, type: 'stone' }, { x: 730, y: GROUND_Y - 220, w: 22, h: 75, type: 'wood' }, { x: 870, y: GROUND_Y - 220, w: 22, h: 75, type: 'wood' }, { x: 720, y: GROUND_Y - 240, w: 185, h: 20, type: 'stone' }, { x: 790, y: GROUND_Y - 300, w: 60, h: 60, type: 'wood' }] },
     { name: 'Снежная крепость', biome: 'ice', birds: ['black', 'yellow', 'white', 'blue', 'black', 'red'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 800, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 900, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 130, r: 22, type: 'normal' }, { x: 850, y: GROUND_Y - 130, r: 22, type: 'normal' }, { x: 800, y: GROUND_Y - 230, r: 26, type: 'normal' }, { x: 700, y: GROUND_Y - 230, r: 20, type: 'normal' }, { x: 900, y: GROUND_Y - 230, r: 20, type: 'normal' }], blocks: [{ x: 660, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 760, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 860, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 650, y: GROUND_Y - 132, w: 256, h: 22, type: 'stone' }, { x: 690, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 790, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 890, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 680, y: GROUND_Y - 232, w: 245, h: 22, type: 'wood' }, { x: 720, y: GROUND_Y - 310, w: 20, h: 78, type: 'wood' }, { x: 870, y: GROUND_Y - 310, w: 20, h: 78, type: 'wood' }, { x: 710, y: GROUND_Y - 330, w: 190, h: 20, type: 'stone' }, { x: 780, y: GROUND_Y - 400, w: 60, h: 70, type: 'stone' }] },
     { name: 'Закат Империи', biome: 'sunset', birds: ['red', 'yellow', 'black', 'blue', 'white', 'black'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 800, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 900, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 750, y: GROUND_Y - 120, r: 24, type: 'normal' }, { x: 850, y: GROUND_Y - 120, r: 24, type: 'normal' }, { x: 800, y: GROUND_Y - 240, r: 24, type: 'normal' }], blocks: [{ x: 680, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 780, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 880, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 670, y: GROUND_Y - 122, w: 245, h: 22, type: 'wood' }, { x: 730, y: GROUND_Y - 200, w: 20, h: 78, type: 'wood' }, { x: 830, y: GROUND_Y - 200, w: 20, h: 78, type: 'wood' }, { x: 720, y: GROUND_Y - 220, w: 130, h: 20, type: 'stone' }, { x: 750, y: GROUND_Y - 290, w: 18, h: 70, type: 'wood' }, { x: 810, y: GROUND_Y - 290, w: 18, h: 70, type: 'wood' }, { x: 740, y: GROUND_Y - 308, w: 100, h: 18, type: 'wood' }] },
@@ -210,8 +218,78 @@ const LEVELS = [
     { name: 'Ночной дозор', biome: 'night', birds: ['black', 'black', 'white', 'yellow', 'blue', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 850, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 750, y: GROUND_Y - 140, r: 22, type: 'normal' }, { x: 850, y: GROUND_Y - 140, r: 22, type: 'normal' }, { x: 800, y: GROUND_Y - 250, r: 26, type: 'normal' }, { x: 800, y: GROUND_Y - 360, r: 20, type: 'normal' }], blocks: [{ x: 700, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 800, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 900, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 690, y: GROUND_Y - 145, w: 235, h: 25, type: 'stone' }, { x: 730, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 860, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 720, y: GROUND_Y - 250, w: 175, h: 20, type: 'stone' }, { x: 760, y: GROUND_Y - 330, w: 20, h: 80, type: 'wood' }, { x: 830, y: GROUND_Y - 330, w: 20, h: 80, type: 'wood' }, { x: 750, y: GROUND_Y - 350, w: 110, h: 20, type: 'wood' }] },
     { name: 'Ледяной ад', biome: 'ice', birds: ['black', 'black', 'black', 'white', 'yellow', 'blue'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 800, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 900, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 140, r: 22, type: 'normal' }, { x: 850, y: GROUND_Y - 140, r: 22, type: 'normal' }, { x: 800, y: GROUND_Y - 250, r: 24, type: 'normal' }, { x: 800, y: GROUND_Y - 360, r: 22, type: 'normal' }], blocks: [{ x: 660, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 760, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 860, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 650, y: GROUND_Y - 145, w: 250, h: 25, type: 'stone' }, { x: 700, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 830, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 690, y: GROUND_Y - 250, w: 160, h: 20, type: 'stone' }, { x: 730, y: GROUND_Y - 330, w: 20, h: 80, type: 'wood' }, { x: 810, y: GROUND_Y - 330, w: 20, h: 80, type: 'wood' }, { x: 720, y: GROUND_Y - 350, w: 110, h: 20, type: 'stone' }] },
     { name: 'Финальная битва', biome: 'sunset', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red', 'black'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 800, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 900, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 130, r: 22, type: 'normal' }, { x: 850, y: GROUND_Y - 130, r: 22, type: 'normal' }, { x: 800, y: GROUND_Y - 230, r: 26, type: 'normal' }, { x: 700, y: GROUND_Y - 230, r: 20, type: 'normal' }, { x: 900, y: GROUND_Y - 230, r: 20, type: 'normal' }, { x: 800, y: GROUND_Y - 340, r: 22, type: 'normal' }], blocks: [{ x: 660, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 760, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 860, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 650, y: GROUND_Y - 132, w: 256, h: 22, type: 'stone' }, { x: 690, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 790, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 890, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 680, y: GROUND_Y - 232, w: 245, h: 22, type: 'wood' }, { x: 720, y: GROUND_Y - 310, w: 20, h: 78, type: 'wood' }, { x: 870, y: GROUND_Y - 310, w: 20, h: 78, type: 'wood' }, { x: 710, y: GROUND_Y - 330, w: 190, h: 20, type: 'stone' }, { x: 780, y: GROUND_Y - 400, w: 60, h: 70, type: 'stone' }] },
-    { name: 'Осада', biome: 'desert', birds: ['black', 'black', 'yellow', 'white', 'blue'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26, type: 'helmet' }, { x: 800, y: GROUND_Y - 150, r: 24, type: 'helmet' }, { x: 800, y: GROUND_Y - 280, r: 22, type: 'helmet' }, { x: 700, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 900, y: GROUND_Y - 26, r: 24, type: 'normal' }], blocks: [{ x: 680, y: GROUND_Y - 100, w: 30, h: 100, type: 'stone' }, { x: 920, y: GROUND_Y - 100, w: 30, h: 100, type: 'stone' }, { x: 670, y: GROUND_Y - 122, w: 280, h: 22, type: 'stone' }, { x: 740, y: GROUND_Y - 200, w: 20, h: 78, type: 'stone' }, { x: 860, y: GROUND_Y - 200, w: 20, h: 78, type: 'stone' }, { x: 730, y: GROUND_Y - 218, w: 160, h: 18, type: 'stone' }, { x: 770, y: GROUND_Y - 300, w: 20, h: 82, type: 'stone' }, { x: 830, y: GROUND_Y - 300, w: 20, h: 82, type: 'stone' }, { x: 760, y: GROUND_Y - 318, w: 100, h: 18, type: 'stone' }] },
-    { name: 'Королевская битва', biome: 'night', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red', 'black'], pigs: [{ x: 750, y: GROUND_Y - 40, r: 40, type: 'boss' }, { x: 750, y: GROUND_Y - 130, r: 22, type: 'helmet' }, { x: 750, y: GROUND_Y - 220, r: 22, type: 'helmet' }], blocks: [{ x: 700, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 800, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 690, y: GROUND_Y - 145, w: 145, h: 25, type: 'stone' }, { x: 720, y: GROUND_Y - 230, w: 20, h: 85, type: 'wood' }, { x: 760, y: GROUND_Y - 230, w: 20, h: 85, type: 'wood' }, { x: 710, y: GROUND_Y - 250, w: 80, h: 20, type: 'stone' }] }
+    
+    { name: 'Осада', biome: 'desert', birds: ['black', 'black', 'yellow', 'white', 'blue'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26, type: 'helmet' }, { x: 800, y: GROUND_Y - 150, r: 24, type: 'helmet' }, { x: 800, y: GROUND_Y - 280, r: 22, type: 'helmet' }, { x: 650, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 950, y: GROUND_Y - 26, r: 24, type: 'normal' }], blocks: [
+        { x: 600, y: GROUND_Y - 150, w: 30, h: 150, type: 'stone' }, 
+        { x: 1000, y: GROUND_Y - 150, w: 30, h: 150, type: 'stone' },
+        { x: 740, y: GROUND_Y - 120, w: 20, h: 120, type: 'glass' }, 
+        { x: 840, y: GROUND_Y - 120, w: 20, h: 120, type: 'glass' },
+        { x: 730, y: GROUND_Y - 140, w: 140, h: 20, type: 'stone' },
+        { x: 770, y: GROUND_Y - 220, w: 20, h: 80, type: 'wood' }, 
+        { x: 810, y: GROUND_Y - 220, w: 20, h: 80, type: 'wood' },
+        { x: 760, y: GROUND_Y - 240, w: 80, h: 20, type: 'stone' }
+    ] },
+    { name: 'Королевская битва', biome: 'night', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red', 'black'], pigs: [
+        { x: 800, y: GROUND_Y - 45, r: 45, type: 'boss' },
+        { x: 700, y: GROUND_Y - 26, r: 22, type: 'helmet' },
+        { x: 900, y: GROUND_Y - 26, r: 22, type: 'helmet' }
+    ], blocks: [
+        { x: 740, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, 
+        { x: 840, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' },
+        { x: 730, y: GROUND_Y - 145, w: 145, h: 25, type: 'stone' },
+        { x: 780, y: GROUND_Y - 240, w: 20, h: 95, type: 'wood' }, 
+        { x: 800, y: GROUND_Y - 240, w: 20, h: 95, type: 'wood' }
+    ] },
+    { name: 'Стеклянный дом', biome: 'sunset', birds: ['red', 'yellow', 'blue'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26, type: 'normal' }], blocks: [
+        { x: 700, y: GROUND_Y - 100, w: 20, h: 100, type: 'glass' }, { x: 780, y: GROUND_Y - 100, w: 20, h: 100, type: 'glass' },
+        { x: 860, y: GROUND_Y - 100, w: 20, h: 100, type: 'glass' }, { x: 680, y: GROUND_Y - 120, w: 220, h: 20, type: 'glass' },
+        { x: 710, y: GROUND_Y - 200, w: 20, h: 80, type: 'glass' }, { x: 850, y: GROUND_Y - 200, w: 20, h: 80, type: 'glass' },
+        { x: 690, y: GROUND_Y - 220, w: 180, h: 20, type: 'glass' }
+    ] },
+    { name: 'Бетонный блок', biome: 'night', birds: ['black', 'white', 'red'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 800, y: GROUND_Y - 150, r: 24, type: 'normal' }], blocks: [
+        { x: 700, y: GROUND_Y - 100, w: 30, h: 100, type: 'stone' }, { x: 900, y: GROUND_Y - 100, w: 30, h: 100, type: 'stone' },
+        { x: 690, y: GROUND_Y - 130, w: 250, h: 30, type: 'stone' }, { x: 750, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' },
+        { x: 830, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' }, { x: 740, y: GROUND_Y - 220, w: 120, h: 20, type: 'stone' }
+    ] },
+    { name: 'Башня', biome: 'ice', birds: ['yellow', 'blue', 'black', 'red'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 24, type: 'helmet' }, { x: 800, y: GROUND_Y - 150, r: 22, type: 'helmet' }, { x: 800, y: GROUND_Y - 270, r: 22, type: 'helmet' }], blocks: [
+        { x: 770, y: GROUND_Y - 100, w: 60, h: 20, type: 'stone' }, { x: 770, y: GROUND_Y - 200, w: 60, h: 20, type: 'wood' }, { x: 770, y: GROUND_Y - 320, w: 60, h: 20, type: 'stone' }
+    ] },
+    { name: 'Ловушка', biome: 'desert', birds: ['black', 'red', 'yellow'], pigs: [{ x: 850, y: GROUND_Y - 26, r: 26, type: 'boss' }], blocks: [
+        { x: 700, y: GROUND_Y - 150, w: 20, h: 150, type: 'wood' }, { x: 900, y: GROUND_Y - 150, w: 20, h: 150, type: 'wood' },
+        { x: 690, y: GROUND_Y - 170, w: 240, h: 20, type: 'stone' }, { x: 720, y: GROUND_Y - 250, w: 20, h: 80, type: 'glass' },
+        { x: 880, y: GROUND_Y - 250, w: 20, h: 80, type: 'glass' }, { x: 710, y: GROUND_Y - 270, w: 200, h: 20, type: 'stone' }
+    ] },
+    { name: 'Разрушитель', biome: 'sunset', birds: ['black', 'black', 'black'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 20, type: 'normal' }, { x: 800, y: GROUND_Y - 120, r: 20, type: 'normal' }, { x: 800, y: GROUND_Y - 220, r: 20, type: 'normal' }], blocks: [
+        { x: 700, y: GROUND_Y - 80, w: 30, h: 80, type: 'glass' }, { x: 870, y: GROUND_Y - 80, w: 30, h: 80, type: 'glass' },
+        { x: 690, y: GROUND_Y - 100, w: 220, h: 20, type: 'wood' }, { x: 750, y: GROUND_Y - 180, w: 20, h: 80, type: 'glass' },
+        { x: 830, y: GROUND_Y - 180, w: 20, h: 80, type: 'glass' }, { x: 740, y: GROUND_Y - 200, w: 120, h: 20, type: 'wood' },
+        { x: 780, y: GROUND_Y - 280, w: 40, h: 80, type: 'glass' }
+    ] },
+    { name: 'Холодная крепость', biome: 'ice', birds: ['black', 'yellow', 'white', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 26, type: 'helmet' }, { x: 850, y: GROUND_Y - 26, r: 26, type: 'helmet' }], blocks: [
+        { x: 700, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 780, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' },
+        { x: 860, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 690, y: GROUND_Y - 120, w: 200, h: 20, type: 'glass' },
+        { x: 720, y: GROUND_Y - 200, w: 20, h: 80, type: 'stone' }, { x: 840, y: GROUND_Y - 200, w: 20, h: 80, type: 'stone' },
+        { x: 710, y: GROUND_Y - 220, w: 150, h: 20, type: 'stone' }
+    ] },
+    { name: 'Королевский бастион', biome: 'sunset', birds: ['black', 'black', 'white', 'blue', 'blue', 'red', 'yellow', 'black'], pigs: [
+        { x: 800, y: GROUND_Y - 36, r: 36, type: 'boss' },
+        { x: 680, y: GROUND_Y - 126, r: 20, type: 'helmet' },
+        { x: 920, y: GROUND_Y - 126, r: 20, type: 'helmet' },
+        { x: 640, y: GROUND_Y - 26, r: 20, type: 'normal' }, { x: 720, y: GROUND_Y - 26, r: 20, type: 'normal' }, { x: 880, y: GROUND_Y - 26, r: 20, type: 'normal' }
+    ], blocks: [
+        { x: 720, y: GROUND_Y - 140, w: 160, h: 20, type: 'stone' },
+        { x: 720, y: GROUND_Y - 60, w: 20, h: 40, type: 'stone' }, 
+        { x: 860, y: GROUND_Y - 60, w: 20, h: 40, type: 'stone' },
+        { x: 740, y: GROUND_Y - 140, w: 20, h: 80, type: 'glass' }, 
+        { x: 840, y: GROUND_Y - 140, w: 20, h: 80, type: 'glass' },
+        { x: 660, y: GROUND_Y - 120, w: 30, h: 20, type: 'wood' }, { x: 660, y: GROUND_Y - 40, w: 10, h: 20, type: 'wood' },
+        { x: 910, y: GROUND_Y - 120, w: 30, h: 20, type: 'wood' }, { x: 930, y: GROUND_Y - 40, w: 10, h: 20, type: 'wood' },
+        { x: 600, y: GROUND_Y - 40, w: 80, h: 20, type: 'stone' }, { x: 680, y: GROUND_Y - 40, w: 80, h: 20, type: 'stone' },
+        { x: 760, y: GROUND_Y - 40, w: 80, h: 20, type: 'stone' }, { x: 840, y: GROUND_Y - 40, w: 80, h: 20, type: 'stone' }
+    ] },
+    { name: 'Последний рубеж', biome: 'night', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red'], pigs: [{ x: 900, y: GROUND_Y - 40, r: 40, type: 'boss' }], blocks: [
+        { x: 700, y: GROUND_Y - 200, w: 20, h: 200, type: 'stone' }, { x: 850, y: GROUND_Y - 100, w: 100, h: 100, type: 'glass' }
+    ] }
 ];
 
 function ensureAudio() { if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} } }
@@ -228,8 +306,7 @@ class Bird {
     constructor(x, y, typeKey = 'red') {
         this.x = x; this.y = y; this.vx = 0; this.vy = 0; this.typeKey = typeKey; this.type = BIRD_TYPES[typeKey]; this.r = this.type.r;
         this.angle = 0; this.angularVel = 0; this.launched = false; this.resting = false; this.trail = []; this.eyeBlink = 0; this.wingFlap = 0;
-        this.hitCooldown = 0; this.abilityUsed = false; this.abilityActive = 0; this.isChild = false; this.pulse = 0;
-        this.stuckTimer = 0;
+        this.hitCooldown = 0; this.abilityUsed = false; this.abilityActive = 0; this.isChild = false; this.pulse = 0; this.stuckTimer = 0;
     }
     launch(vx, vy) {
         this.vx = vx; this.vy = vy; this.launched = true; this.resting = false; this.angularVel = 0.18;
@@ -239,10 +316,7 @@ class Bird {
     activateAbility() {
         if (this.abilityUsed || !this.launched || this.resting) return false; 
         const ab = this.type.ability; if (!ab) return false;
-        
-        this.abilityUsed = true; 
-        SFX.ability(); state.shake = 5; saveData.stats.abilities++; state.abilitiesUsed++; saveGame();
-
+        this.abilityUsed = true; SFX.ability(); state.shake = 5; saveData.stats.abilities++; state.abilitiesUsed++; saveGame();
         if (ab === 'dash') {
             const sp = Math.hypot(this.vx, this.vy)||1; this.vx = (this.vx/sp)*22; this.vy = (this.vy/sp)*22; this.abilityActive = 30; SFX.dash();
             for(let i=0;i<15;i++) particles.push(new Particle(this.x-this.vx*i*0.3, this.y-this.vy*i*0.3, '#ffe066', {vx:rand(-1,1),vy:rand(-1,1),size:rand(4,8),gravity:0,decay:0.04}));
@@ -255,10 +329,7 @@ class Bird {
             } SFX.split(); spawnBurst(this.x, this.y, '#74c0fc', 12);
         } else if (ab === 'bomb') { 
             this.explode(); 
-            if (pigs.every(p => p.dead)) { 
-                state.phase = 'over'; 
-                setTimeout(showVictory, 500); 
-            }
+            if (pigs.every(p => p.dead)) { state.phase = 'over'; setTimeout(showVictory, 500); }
         } else if (ab === 'drop') { 
             eggs.push(new Egg(this.x, this.y + this.r, this)); this.vy -= 3; SFX.ability(); spawnBurst(this.x, this.y + this.r, '#fff', 8); 
         }
@@ -284,9 +355,7 @@ class Bird {
             }
             if (this.x + this.r > W) { this.x = W - this.r; this.vx *= -0.5; }
             if (this.x - this.r < 0) { this.x = this.r; this.vx *= -0.5; }
-            if (Math.abs(this.vx) < 0.1 && Math.abs(this.vy) < 0.1) {
-                this.stuckTimer++; if (this.stuckTimer > 120) this.resting = true;
-            } else { this.stuckTimer = 0; }
+            if (Math.abs(this.vx) < 0.1 && Math.abs(this.vy) < 0.1) { this.stuckTimer++; if (this.stuckTimer > 120) this.resting = true; } else { this.stuckTimer = 0; }
             if (Math.abs(this.vx) < 0.15 && this.y + this.r >= GROUND_Y - 1 && Math.abs(this.vy) < 0.5) this.resting = true;
         } else { this.wingFlap += 0.08; }
         if (this.hitCooldown > 0) this.hitCooldown--; if (this.eyeBlink > 0) this.eyeBlink--; else if (Math.random() < 0.008) this.eyeBlink = 8;
@@ -364,22 +433,13 @@ class Egg {
 }
 
 class Pig {
-    constructor(x, y, r = 26, type = 'normal') { 
-        this.x=x; this.y=y; this.r=r; this.type=type; this.vx=0; this.vy=0; this.hp = type==='boss' ? 3 : 1; this.dead=false; this.resting=true; this.hurtFlash=0; this.blink=0; this.squish=0; this.breathing=Math.random()*Math.PI*2; 
-    }
+    constructor(x, y, r = 26, type = 'normal') { this.x=x; this.y=y; this.r=r; this.type=type; this.vx=0; this.vy=0; this.hp = type==='boss' ? 3 : 1; this.dead=false; this.resting=true; this.hurtFlash=0; this.blink=0; this.squish=0; this.breathing=Math.random()*Math.PI*2; }
     damage(amount, angle) { 
         if (this.dead) return; 
-        // Проверка каски: если птица летит сверху, урона нет
         if (this.type === 'helmet' && angle !== undefined) {
-            // Угол от 45 до 135 градусов (сверху) = защита
             const deg = (angle * 180 / Math.PI) % 360;
-            if (deg > 45 && deg < 135) {
-                SFX.wood();
-                spawnBurst(this.x, this.y - this.r, '#ccc', 8);
-                return; 
-            }
+            if (deg > 45 && deg < 135) { SFX.wood(); spawnBurst(this.x, this.y - this.r, '#ccc', 8); return; }
         }
-
         this.hp -= amount; this.hurtFlash = 12; this.squish = 1;
         if (this.hp <= 0) { 
             this.dead = true; 
@@ -397,96 +457,82 @@ class Pig {
         ctx.save(); ctx.translate(this.x, this.y); ctx.scale(sx, sy);
         ctx.beginPath(); ctx.ellipse(0, R * 0.95, R * 0.9, R * 0.25, 0, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fill();
         const bg = ctx.createRadialGradient(-R*0.35, -R*0.4, R*0.1, 0, 0, R*1.15); 
-        
-        // Цвета для разных свиней
-        if (this.type === 'boss') { bg.addColorStop(0, '#e0c0ff'); bg.addColorStop(0.5, '#b388ff'); bg.addColorStop(1, '#7c4dff'); }
+        if (this.type === 'boss') { bg.addColorStop(0, '#8e24aa'); bg.addColorStop(0.5, '#6a1b9a'); bg.addColorStop(1, '#4a148c'); }
         else if (this.hurtFlash > 0) { bg.addColorStop(0, '#ffb3b3'); bg.addColorStop(0.5, '#ff6b6b'); bg.addColorStop(1, '#b03030'); } 
         else { bg.addColorStop(0, '#c5f7ae'); bg.addColorStop(0.5, '#79d65c'); bg.addColorStop(1, '#3f8a2a'); }
-        
         ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.fillStyle = bg; ctx.fill();
         ctx.beginPath(); ctx.ellipse(-R*0.35, -R*0.45, R*0.35, R*0.22, -0.5, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fill();
         ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(30,70,20,0.8)'; ctx.lineWidth = 2; ctx.stroke();
-        
-        // Уши
         ctx.beginPath(); ctx.ellipse(-R*0.75, -R*0.55, R*0.22, R*0.3, -0.6, 0, Math.PI * 2); ctx.fillStyle = '#5cae42'; ctx.fill(); ctx.strokeStyle = '#3f8a2a'; ctx.lineWidth = 1.5; ctx.stroke();
         ctx.beginPath(); ctx.ellipse(R*0.75, -R*0.55, R*0.22, R*0.3, 0.6, 0, Math.PI * 2); ctx.fillStyle = '#5cae42'; ctx.fill(); ctx.stroke();
-        
-        // Глаза
         const eo = this.blink > 0 ? 0.1 : 1;
         ctx.beginPath(); ctx.ellipse(-R*0.3, -R*0.2, R*0.22, R*0.26 * eo, 0, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); ctx.strokeStyle = '#2d4d1e'; ctx.lineWidth = 1.5; ctx.stroke();
         ctx.beginPath(); ctx.ellipse(R*0.3, -R*0.2, R*0.22, R*0.26 * eo, 0, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); ctx.stroke();
-        if (this.blink <= 0) { 
-            ctx.beginPath(); ctx.arc(-R*0.28, -R*0.18, R*0.1, 0, Math.PI * 2); ctx.fillStyle = '#111'; ctx.fill(); 
-            ctx.beginPath(); ctx.arc(R*0.28, -R*0.18, R*0.1, 0, Math.PI * 2); ctx.fillStyle = '#111'; ctx.fill();
-            ctx.beginPath(); ctx.arc(-R*0.31, -R*0.22, R*0.04, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); 
-            ctx.beginPath(); ctx.arc(R*0.25, -R*0.22, R*0.04, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); 
-        }
-        // Пятачок
-        ctx.beginPath(); ctx.ellipse(0, R*0.28, R*0.42, R*0.32, 0, 0, Math.PI * 2); 
-        const sg = ctx.createRadialGradient(-R*0.1, R*0.2, 2, 0, R*0.28, R*0.5); sg.addColorStop(0, '#b8f0a0'); sg.addColorStop(1, '#5cae42');
+        if (this.blink <= 0) { ctx.beginPath(); ctx.arc(-R*0.28, -R*0.18, R*0.1, 0, Math.PI * 2); ctx.fillStyle = '#111'; ctx.fill(); ctx.beginPath(); ctx.arc(R*0.28, -R*0.18, R*0.1, 0, Math.PI * 2); ctx.fillStyle = '#111'; ctx.fill();
+            ctx.beginPath(); ctx.arc(-R*0.31, -R*0.22, R*0.04, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); ctx.beginPath(); ctx.arc(R*0.25, -R*0.22, R*0.04, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); }
+        ctx.beginPath(); ctx.ellipse(0, R*0.28, R*0.42, R*0.32, 0, 0, Math.PI * 2); const sg = ctx.createRadialGradient(-R*0.1, R*0.2, 2, 0, R*0.28, R*0.5); sg.addColorStop(0, '#b8f0a0'); sg.addColorStop(1, '#5cae42');
         ctx.fillStyle = sg; ctx.fill(); ctx.strokeStyle = '#2d4d1e'; ctx.lineWidth = 1.5; ctx.stroke();
-        ctx.beginPath(); ctx.ellipse(-R*0.13, R*0.28, R*0.06, R*0.09, 0, 0, Math.PI * 2); ctx.fillStyle = '#2d4d1e'; ctx.fill(); 
-        ctx.beginPath(); ctx.ellipse(R*0.13, R*0.28, R*0.06, R*0.09, 0, 0, Math.PI * 2); ctx.fillStyle = '#2d4d1e'; ctx.fill(); 
-
-        // Отрисовка Каски
+        ctx.beginPath(); ctx.ellipse(-R*0.13, R*0.28, R*0.06, R*0.09, 0, 0, Math.PI * 2); ctx.fillStyle = '#2d4d1e'; ctx.fill(); ctx.beginPath(); ctx.ellipse(R*0.13, R*0.28, R*0.06, R*0.09, 0, 0, Math.PI * 2); ctx.fillStyle = '#2d4d1e'; ctx.fill(); 
         if (this.type === 'helmet') {
-            ctx.beginPath();
-            ctx.arc(0, -R*0.3, R*0.95, Math.PI, 0);
-            ctx.lineTo(R*1.0, -R*0.3);
-            ctx.lineTo(-R*1.0, -R*0.3);
-            ctx.closePath();
-            const hg = ctx.createLinearGradient(0, -R*1.2, 0, -R*0.3);
-            hg.addColorStop(0, '#a0a0a0'); hg.addColorStop(1, '#505050');
-            ctx.fillStyle = hg;
-            ctx.fill();
-            ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.stroke();
+            ctx.beginPath(); ctx.arc(0, -R*0.3, R*0.95, Math.PI, 0); ctx.lineTo(R*1.0, -R*0.3); ctx.lineTo(-R*1.0, -R*0.3); ctx.closePath();
+            const hg = ctx.createLinearGradient(0, -R*1.2, 0, -R*0.3); hg.addColorStop(0, '#a0a0a0'); hg.addColorStop(1, '#505050');
+            ctx.fillStyle = hg; ctx.fill(); ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.stroke();
         }
-
-        // Корона для босса
         if (this.type === 'boss') {
-            ctx.beginPath();
-            ctx.moveTo(-R*0.6, -R*0.8);
-            ctx.lineTo(-R*0.8, -R*1.3);
-            ctx.lineTo(-R*0.3, -R*1.0);
-            ctx.lineTo(0, -R*1.5);
-            ctx.lineTo(R*0.3, -R*1.0);
-            ctx.lineTo(R*0.8, -R*1.3);
-            ctx.lineTo(R*0.6, -R*0.8);
-            ctx.closePath();
-            ctx.fillStyle = '#ffd700';
-            ctx.fill();
-            ctx.strokeStyle = '#b8860b'; ctx.lineWidth = 2; ctx.stroke();
-            
-            // Полоска здоровья босса
-            ctx.fillStyle = 'rgba(0,0,0,0.5)';
-            ctx.fillRect(-R*1.2, R*1.2, R*2.4, 6);
-            ctx.fillStyle = '#ff3b30';
-            ctx.fillRect(-R*1.2, R*1.2, R*2.4 * (this.hp/3), 6);
+            ctx.beginPath(); ctx.moveTo(-R*0.6, -R*0.8); ctx.lineTo(-R*0.8, -R*1.3); ctx.lineTo(-R*0.3, -R*1.0); ctx.lineTo(0, -R*1.5); ctx.lineTo(R*0.3, -R*1.0); ctx.lineTo(R*0.8, -R*1.3); ctx.lineTo(R*0.6, -R*0.8); ctx.closePath();
+            ctx.fillStyle = '#ffd700'; ctx.fill(); ctx.strokeStyle = '#b8860b'; ctx.lineWidth = 2; ctx.stroke();
+            ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(-R*1.2, R*1.2, R*2.4, 6);
+            ctx.fillStyle = '#ff3b30'; ctx.fillRect(-R*1.2, R*1.2, R*2.4 * (this.hp/3), 6);
         }
-
         ctx.restore();
     }
 }
 
 class Block {
-    constructor(x, y, w, h, type = 'wood') { this.x=x; this.y=y; this.w=w; this.h=h; this.type=type; this.vx=0; this.vy=0; this.resting=true; this.hp = type==='stone'?200:100; this.maxHp=this.hp; this.flash=0; this.rot=0; this.rotVel=0; this.texSeed = (x*7+y*13+w*3)%100; }
+    constructor(x, y, w, h, type = 'wood') { 
+        this.x=x; this.y=y; this.w=w; this.h=h; this.type=type; this.vx=0; this.vy=0; this.resting=true; 
+        if(type==='stone') this.hp = 200;
+        else if(type==='glass') this.hp = 30;
+        else this.hp = 100;
+        this.maxHp=this.hp; this.flash=0; this.rot=0; this.rotVel=0; this.texSeed = (x*7+y*13+w*3)%100; 
+    }
     damage(amount) { this.hp -= amount; this.flash = 10;
-        if (this.hp <= 0) { SFX.wood(); spawnBurst(this.x+this.w/2, this.y+this.h/2, this.type==='stone'?'#9aa5b1':'#c8965c', 14); state.score += 500; addScore(500, this.x+this.w/2, this.y+this.h/2); saveData.stats.blocks++; saveGame(); } }
-    update() { if (this.flash > 0) this.flash--; if (this.hp <= 0) return;
+        if (this.hp <= 0) { 
+            SFX.wood(); 
+            const col = this.type==='stone'?'#9aa5b1':(this.type==='glass'?'#e0f7fa':'#c8965c');
+            spawnBurst(this.x+this.w/2, this.y+this.h/2, col, 14); 
+            state.score += this.type==='glass' ? 200 : 500; addScore(this.type==='glass' ? 200 : 500, this.x+this.w/2, this.y+this.h/2); 
+            saveData.stats.blocks++; saveGame(); 
+        } 
+    }
+    update() { 
+        if (this.flash > 0) this.flash--; if (this.hp <= 0) return;
         if (!this.resting) { this.vy += GRAVITY; this.vx *= AIR; this.x += this.vx; this.y += this.vy; this.rot += this.rotVel;
             if (this.y + this.h >= GROUND_Y) { this.y = GROUND_Y - this.h; this.vy *= -0.3; this.vx *= 0.7; this.rotVel *= 0.5;
                 if (Math.abs(this.vy) < 1 && Math.abs(this.vx) < 0.5) { this.vy = 0; this.vx = 0; this.resting = true; this.rotVel = 0; } }
-            if (this.x < 0) { this.x = 0; this.vx *= -0.5; } if (this.x + this.w > W) { this.x = W - this.w; this.vx *= -0.5; } } }
-    draw() { if (this.hp <= 0) return;
+            if (this.x < 0) { this.x = 0; this.vx *= -0.5; } if (this.x + this.w > W) { this.x = W - this.w; this.vx *= -0.5; } } 
+    }
+    draw() { 
+        if (this.hp <= 0) return;
         ctx.save(); ctx.translate(this.x + this.w/2, this.y + this.h/2); ctx.rotate(this.rot); const x = -this.w/2, y = -this.h/2;
         ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 4; let grad;
         if (this.type === 'stone') { grad = ctx.createLinearGradient(x, y, x+this.w, y+this.h); if (this.flash > 0) { grad.addColorStop(0, '#ffcccc'); grad.addColorStop(1, '#cc8888'); } else { grad.addColorStop(0, '#c5cdd6'); grad.addColorStop(0.5, '#7d8896'); grad.addColorStop(1, '#4d5762'); } }
+        else if (this.type === 'glass') { grad = ctx.createLinearGradient(x, y, x+this.w, y+this.h); if (this.flash > 0) { grad.addColorStop(0, '#fff'); grad.addColorStop(1, '#aaa'); } else { grad.addColorStop(0, 'rgba(200,240,255,0.7)'); grad.addColorStop(0.5, 'rgba(150,210,240,0.6)'); grad.addColorStop(1, 'rgba(100,180,220,0.7)'); } }
         else { grad = ctx.createLinearGradient(x, y, x, y+this.h); if (this.flash > 0) { grad.addColorStop(0, '#ffb3b3'); grad.addColorStop(1, '#cc6666'); } else { grad.addColorStop(0, '#e0b078'); grad.addColorStop(0.4, '#c8965c'); grad.addColorStop(1, '#8a5c2c'); } }
         ctx.fillStyle = grad; ctx.fillRect(x, y, this.w, this.h); ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
-        if (this.type === 'wood') { ctx.strokeStyle = 'rgba(80,40,10,0.35)'; ctx.lineWidth = 1; const iV = this.h > this.w, c = Math.max(2, Math.floor(iV ? this.w/8 : this.h/8));
-            for (let i = 1; i < c; i++) { ctx.beginPath(); if (iV) { const px = x + i*(this.w/c); ctx.moveTo(px, y); ctx.lineTo(px, y+this.h); } else { const py = y + i*(this.h/c); ctx.moveTo(x, py); ctx.lineTo(x+this.w, py); } ctx.stroke(); } }
-        else { ctx.strokeStyle = 'rgba(40,50,60,0.4)'; ctx.lineWidth = 1; for (let i = 0; i < 3; i++) { const sx = x + ((this.texSeed+i*37)%100)/100*this.w, sy = y + ((this.texSeed+i*53)%100)/100*this.h; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx+8, sy+10); ctx.lineTo(sx+3, sy+18); ctx.stroke(); } }
-        ctx.strokeStyle = this.type==='stone'?'#2d3742':'#5a3a1a'; ctx.lineWidth = 2; ctx.strokeRect(x, y, this.w, this.h);
+        
+        if (this.type === 'wood') { 
+            ctx.strokeStyle = 'rgba(80,40,10,0.35)'; ctx.lineWidth = 1; const iV = this.h > this.w, c = Math.max(2, Math.floor(iV ? this.w/8 : this.h/8));
+            for (let i = 1; i < c; i++) { ctx.beginPath(); if (iV) { const px = x + i*(this.w/c); ctx.moveTo(px, y); ctx.lineTo(px, y+this.h); } else { const py = y + i*(this.h/c); ctx.moveTo(x, py); ctx.lineTo(x+this.w, py); } ctx.stroke(); } 
+        } else if (this.type === 'glass') {
+            ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(x+2, y+2); ctx.lineTo(x+this.w/2, y+this.h/2); ctx.lineTo(x+2, y+this.h-2); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x+this.w-2, y+2); ctx.lineTo(x+this.w/2, y+this.h/2); ctx.lineTo(x+this.w-2, y+this.h-2); ctx.stroke();
+        } else { 
+            ctx.strokeStyle = 'rgba(40,50,60,0.4)'; ctx.lineWidth = 1; for (let i = 0; i < 3; i++) { const sx = x + ((this.texSeed+i*37)%100)/100*this.w, sy = y + ((this.texSeed+i*53)%100)/100*this.h; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx+8, sy+10); ctx.lineTo(sx+3, sy+18); ctx.stroke(); } 
+        }
+        
+        ctx.strokeStyle = this.type==='stone'?'#2d3742':(this.type==='glass'?'#80deea':'#5a3a1a'); ctx.lineWidth = 2; ctx.strokeRect(x, y, this.w, this.h);
         const blik = ctx.createLinearGradient(x, y, x, y+this.h*0.35); blik.addColorStop(0, 'rgba(255,255,255,0.35)'); blik.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = blik; ctx.fillRect(x, y, this.w, this.h*0.35); ctx.restore();
     }
 }
@@ -578,7 +624,7 @@ function drawTrajectory() {
     ctx.save(); ctx.setLineDash([6, 12]); ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(sx, sy);
     for (let i = 0; i < 80; i++) {
-        vy += GRAVITY; vx *= AIR; vy *= AIR; sx += vx; sy += vy;
+        vy += GRAVITY; sx += vx; sy += vy;
         if (sy > GROUND_Y || sx > W || sx < 0) break;
         ctx.lineTo(sx, sy);
     }
@@ -586,7 +632,7 @@ function drawTrajectory() {
 
     sx = slingshot.x; sy = slingshot.y; vx = Math.cos(angle) * power * LAUNCH_MULT; vy = Math.sin(angle) * power * LAUNCH_MULT;
     for (let i = 0; i < 80; i++) {
-        vy += GRAVITY; vx *= AIR; vy *= AIR; sx += vx; sy += vy;
+        vy += GRAVITY; sx += vx; sy += vy;
         if (sy > GROUND_Y || sx > W || sx < 0) break;
         if (i % 5 === 0) {
             const t = i / 80, alpha = 0.9 * (1 - t * 0.7), r = 3.5 * (1 - t * 0.4);
@@ -720,10 +766,7 @@ function endShot() {
     const alivePigs = pigs.filter(p => !p.dead).length;
     if (alivePigs === 0) { setTimeout(() => { if (state.phase === 'settling') { state.phase = 'over'; showVictory(); } }, 600); return; }
     
-    if (currentBirdQueue.length === 0) { 
-        setTimeout(() => { if (state.phase === 'settling') { state.phase = 'over'; showDefeat(); } }, 600); 
-        return; 
-    }
+    if (currentBirdQueue.length === 0) { setTimeout(() => { if (state.phase === 'settling') { state.phase = 'over'; showDefeat(); } }, 600); return; }
 
     setTimeout(() => { if (state.phase === 'settling') { birds = birds.filter(b => b.launched && !b.resting); bird = null; spawnNextBird(); } }, 700);
 }
@@ -738,8 +781,6 @@ function showVictory() {
     }
 
     const level = LEVELS[currentLevelIdx]; 
-    
-    // Подсчет идеального максимума для уровня (все свиньи + все блоки + бонус за 1 оставшуюся птицу)
     const maxPossible = (level.pigs.length * 5000) + (level.blocks.length * 500) + 10000;
     let stars = 1;
     if (state.score >= maxPossible * 0.85) stars = 3; 
@@ -815,8 +856,10 @@ canvas.addEventListener('touchcancel', (e) => { e.preventDefault(); onUp(e); }, 
 playBtn.addEventListener('click', () => { ensureAudio(); menuScreen.classList.remove('show'); levelsScreen.classList.remove('show'); showGameUI(); loadLevel(0); });
 levelsBtn.addEventListener('click', () => { ensureAudio(); menuScreen.classList.remove('show'); buildLevelsGrid(); levelsScreen.classList.add('show'); });
 achievementsBtn.addEventListener('click', () => { menuScreen.classList.remove('show'); buildAchievementsGrid(); achievementsScreen.classList.add('show'); });
+creditsBtn.addEventListener('click', () => { menuScreen.classList.remove('show'); creditsScreen.classList.add('show'); });
 backBtn.addEventListener('click', () => { levelsScreen.classList.remove('show'); menuScreen.classList.add('show'); });
 achBackBtn.addEventListener('click', () => { achievementsScreen.classList.remove('show'); menuScreen.classList.add('show'); });
+creditsBackBtn.addEventListener('click', () => { creditsScreen.classList.remove('show'); menuScreen.classList.add('show'); });
 menuSoundBtn.addEventListener('click', () => { soundEnabled = !soundEnabled; menuSoundBtn.textContent = soundEnabled ? '🔊 Звук: Вкл' : '🔇 Звук: Выкл'; soundBtn.textContent = soundEnabled ? '🔊' : '🔇'; if (soundEnabled) { ensureAudio(); beep(600, 0.1, 'sine', 0.1); } });
 soundBtn.addEventListener('click', () => { soundEnabled = !soundEnabled; soundBtn.textContent = soundEnabled ? '🔊' : '🔇'; menuSoundBtn.textContent = soundEnabled ? '🔊 Звук: Вкл' : '🔇 Звук: Выкл'; if (soundEnabled) { ensureAudio(); beep(600, 0.1, 'sine', 0.1); } });
 restartBtn.addEventListener('click', () => { ensureAudio(); loadLevel(currentLevelIdx); });
@@ -909,6 +952,5 @@ initBackground();
 loadSave();
 requestAnimationFrame(gameLoop);
 </script>
-
 </body>
 </html>
