@@ -3,35 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Angry Birds — Ultimate Edition (Perfect Physics + Music)</title>
+<title>Angry Birds — Ultimate Edition</title>
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-        height: 100%; overflow: hidden; font-family: 'Segoe UI', Tahoma, sans-serif;
-        background: #0a0e27; user-select: none; -webkit-tap-highlight-color: transparent;
-        display: flex; justify-content: center; align-items: center;
-    }
+    html, body { height: 100%; overflow: hidden; font-family: 'Segoe UI', Tahoma, sans-serif; background: #0a0e27; user-select: none; -webkit-tap-highlight-color: transparent; display: flex; justify-content: center; align-items: center; }
     #gameWrap { position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; }
-    canvas {
-        display: block; border-radius: 14px; box-shadow: 0 0 0 3px rgba(255,255,255,0.08), 0 25px 70px rgba(0,0,0,0.65);
-        cursor: grab; touch-action: none; max-width: 100%; max-height: 100%;
-    }
+    canvas { display: block; border-radius: 14px; box-shadow: 0 0 0 3px rgba(255,255,255,0.08), 0 25px 70px rgba(0,0,0,0.65); cursor: grab; touch-action: none; max-width: 100%; max-height: 100%; }
     canvas:active { cursor: grabbing; }
-    
     #fps-counter { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.5); color: #0f0; padding: 5px 10px; border-radius: 8px; font-family: monospace; font-weight: bold; z-index: 99; pointer-events: none; display: none; }
-    
     .hud { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 10; pointer-events: none; }
     .pill { background: linear-gradient(180deg, #fff, #e0eaff); border-radius: 40px; padding: 10px 22px; font-weight: 800; font-size: 17px; color: #1a2340; box-shadow: 0 6px 20px rgba(0,0,0,0.35); display: flex; align-items: center; gap: 8px; }
     .pill .icon { font-size: 20px; }
     #score { color: #e63946; font-size: 20px; }
     #levelNameHud { color: #1971c2; }
-    .controls { position: absolute; bottom: 24px; right: 24px; display: flex; gap: 12px; z-index: 10; }
-    button.btn { border: none; border-radius: 14px; padding: 13px 24px; font-size: 15px; font-weight: 800; color: white; cursor: pointer; box-shadow: 0 6px 0 rgba(0,0,0,0.25); transition: transform 0.12s; display: flex; align-items: center; gap: 8px; font-family: inherit; }
+    .controls { position: absolute; bottom: 20px; right: 20px; display: flex; gap: 10px; z-index: 10; }
+    button.btn { border: none; border-radius: 14px; padding: 12px 20px; font-size: 15px; font-weight: 800; color: white; cursor: pointer; box-shadow: 0 6px 0 rgba(0,0,0,0.25); transition: transform 0.12s; display: flex; align-items: center; gap: 6px; font-family: inherit; }
     button.btn:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,0.25); }
     .btn-restart { background: linear-gradient(180deg, #ff8c42, #f4511e); }
     .btn-menu    { background: linear-gradient(180deg, #7e57c2, #4527a0); }
     .btn-play    { background: linear-gradient(180deg, #52b788, #2d6a4f); font-size: 18px; padding: 15px 42px; border-radius: 16px; }
-    .hint { position: absolute; bottom: 24px; left: 24px; background: rgba(255,255,255,0.9); color: #1a2340; padding: 10px 18px; border-radius: 12px; font-size: 13px; font-weight: 700; z-index: 10; max-width: 260px; transition: opacity 0.5s; }
+    .hint { position: absolute; bottom: 20px; left: 20px; background: rgba(255,255,255,0.9); color: #1a2340; padding: 10px 16px; border-radius: 12px; font-size: 12px; font-weight: 700; z-index: 10; max-width: 280px; transition: opacity 0.5s; line-height: 1.5; }
     .overlay { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.4s; background: rgba(10,14,39,0.85); border-radius: 14px; }
     .overlay.show { opacity: 1; pointer-events: auto; }
     .overlay-card { background: linear-gradient(180deg, #fffbf2, #ffe9c7); border-radius: 28px; padding: 42px 56px; text-align: center; transform: scale(0.8); transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
@@ -50,55 +41,37 @@
     .menu-btn:active { transform: translateY(6px); box-shadow: 0 2px 0 rgba(0,0,0,0.3); }
     .menu-btn.primary   { background: linear-gradient(180deg, #52b788, #2d6a4f); }
     .menu-btn.secondary { background: linear-gradient(180deg, #4dabf7, #1971c2); }
-    .menu-btn.tertiary  { background: linear-gradient(180deg, #f5a623, #c87a00); }
     .menu-btn.quaternary{ background: linear-gradient(180deg, #f76b8a, #c9184a); }
     .menu-btn.settings  { background: linear-gradient(180deg, #667eea, #764ba2); }
-    
     .levels-screen { position: absolute; inset: 0; z-index: 110; display: flex; flex-direction: column; align-items: center; background: linear-gradient(180deg, #1a2151 0%, #3d4d8c 50%, #7a6bb0 100%); border-radius: 14px; opacity: 0; pointer-events: none; transition: opacity 0.5s; padding: 30px 20px; overflow-y: auto; }
     .levels-screen.show { opacity: 1; pointer-events: auto; }
-    .levels-header { display: flex; align-items: center; justify-content: space-between; width: min(900px, 100%); margin-bottom: 30px; }
+    .levels-header { display: flex; align-items: center; justify-content: space-between; width: min(1000px, 100%); margin-bottom: 24px; }
     .levels-title { font-size: 46px; font-weight: 900; color: white; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
     .btn-back { border: none; border-radius: 14px; padding: 12px 22px; font-size: 15px; font-weight: 800; color: white; cursor: pointer; background: linear-gradient(180deg, #7e57c2, #4527a0); box-shadow: 0 5px 0 rgba(0,0,0,0.3); }
-    
-    .category-title { width: min(900px, 100%); color: white; font-size: 24px; font-weight: 800; margin-top: 20px; margin-bottom: 16px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; }
-    .levels-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 16px; width: min(900px, 100%); margin-bottom: 20px; }
-    
-    .level-card { background: linear-gradient(180deg, #fffbf2, #ffd9a0); border-radius: 20px; padding: 16px 12px; text-align: center; cursor: pointer; transition: transform 0.2s; box-shadow: 0 6px 0 rgba(120,80,40,0.5); position: relative; }
-    .level-card:hover { transform: translateY(-5px); }
+    .category-title { width: min(1000px, 100%); color: white; font-size: 22px; font-weight: 800; margin-top: 18px; margin-bottom: 12px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; }
+    .levels-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 10px; width: min(1000px, 100%); margin-bottom: 12px; }
+    .level-card { background: linear-gradient(180deg, #fffbf2, #ffd9a0); border-radius: 14px; padding: 10px 6px; text-align: center; cursor: pointer; transition: transform 0.15s; box-shadow: 0 4px 0 rgba(120,80,40,0.5); position: relative; }
+    .level-card:hover { transform: translateY(-3px); }
     .level-card.locked { filter: grayscale(0.85) brightness(0.65); cursor: not-allowed; }
-    .level-num { font-size: 26px; font-weight: 900; color: #e63946; }
-    .level-name { font-size: 13px; font-weight: 800; color: #4a3b2a; margin-bottom: 8px; min-height: 30px; display: flex; align-items: center; justify-content: center; }
-    .level-birds { display: flex; gap: 4px; justify-content: center; margin-bottom: 8px; flex-wrap: wrap; }
-    .bird-icon { width: 26px; height: 26px; border-radius: 50%; position: relative; box-shadow: 0 2px 6px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.4); }
-    .bird-icon.red    { background: radial-gradient(circle at 35% 30%, #ff8080, #c81e1e 70%, #7a0a0a); }
-    .bird-icon.yellow { background: radial-gradient(circle at 35% 30%, #fff59d, #ffc107 70%, #a87a00); clip-path: polygon(100% 50%, 0 0, 0 100%); border-radius: 0; border: none; }
-    .bird-icon.blue   { background: radial-gradient(circle at 35% 30%, #90caf9, #2196f3 70%, #0d47a1); }
-    .bird-icon.black  { background: radial-gradient(circle at 35% 30%, #6c757d, #212529 70%, #000); }
-    .bird-icon.white  { background: radial-gradient(circle at 35% 30%, #ffffff, #cfd8dc 70%, #90a4ae); }
-    .bird-icon::before { content: ''; position: absolute; width: 8px; height: 8px; background: white; border-radius: 50%; top: 32%; left: 22%; box-shadow: 6px 0 0 white; }
-    .bird-icon::after { content: ''; position: absolute; width: 3px; height: 3px; background: #000; border-radius: 50%; top: 40%; left: 28%; box-shadow: 6px 0 0 #000; }
-    .bird-icon.yellow::before { top: 38%; left: 30%; box-shadow: 6px 0 0 white; }
-    .bird-icon.yellow::after { top: 46%; left: 36%; box-shadow: 6px 0 0 #000; }
-    .level-stars { font-size: 16px; }
-    .level-lock { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 46px; }
-    
-    .ability-indicator { position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); border-radius: 16px; padding: 12px 24px; font-weight: 800; font-size: 15px; color: #1a2340; z-index: 11; display: none; align-items: center; gap: 10px; }
+    .level-card.current { box-shadow: 0 0 0 3px #4dabf7, 0 4px 0 rgba(120,80,40,0.5); }
+    .level-num { font-size: 20px; font-weight: 900; color: #e63946; }
+    .level-name { font-size: 9px; font-weight: 800; color: #4a3b2a; margin-bottom: 4px; min-height: 22px; display: flex; align-items: center; justify-content: center; }
+    .level-stars { font-size: 12px; }
+    .level-lock { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 30px; }
+    .ability-indicator { position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); border-radius: 16px; padding: 12px 24px; font-weight: 800; font-size: 15px; color: #1a2340; z-index: 11; display: none; align-items: center; gap: 10px; }
     .ability-indicator.show { display: flex; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
     .toast-ach { position: fixed; top: 80px; right: 20px; background: linear-gradient(180deg, #fff9e6, #ffd700); color: #4a3b2a; padding: 16px 24px; border-radius: 16px; font-weight: 800; font-size: 15px; z-index: 999; display: flex; align-items: center; gap: 12px; transform: translateX(400px); transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; }
     .toast-ach.show { transform: translateX(0); }
-
-    /* Настройки */
-    .settings-screen { position: absolute; inset: 0; z-index: 120; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(180deg, #1a2151 0%, #3d4d8c 100%); border-radius: 14px; opacity: 0; pointer-events: none; transition: opacity 0.5s; padding: 30px 20px; }
+    .settings-screen { position: absolute; inset: 0; z-index: 120; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(180deg, #1a2151 0%, #3d4d8c 100%); border-radius: 14px; opacity: 0; pointer-events: none; transition: opacity 0.5s; padding: 30px 20px; overflow-y: auto; }
     .settings-screen.show { opacity: 1; pointer-events: auto; }
-    .settings-panel { background: rgba(255,255,255,0.1); border-radius: 24px; padding: 30px; width: min(400px, 90%); display: flex; flex-direction: column; gap: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
-    .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(0,0,0,0.2); border-radius: 12px; color: white; font-weight: 700; font-size: 16px; }
-    .setting-btn { border: none; border-radius: 10px; padding: 8px 16px; font-weight: 800; cursor: pointer; transition: 0.2s; min-width: 90px; }
+    .settings-panel { background: rgba(255,255,255,0.1); border-radius: 24px; padding: 26px; width: min(440px, 92%); display: flex; flex-direction: column; gap: 10px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
+    .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(0,0,0,0.2); border-radius: 12px; color: white; font-weight: 700; font-size: 15px; }
+    .setting-btn { border: none; border-radius: 10px; padding: 8px 14px; font-weight: 800; cursor: pointer; transition: 0.2s; min-width: 90px; }
     .setting-btn.on { background: #4cd964; color: white; }
     .setting-btn.off { background: #ff3b30; color: white; }
     .setting-btn.neutral { background: rgba(255,255,255,0.2); color: white; }
-    
-    @media (max-width: 700px) { .hint { display: none; } .menu-title { font-size: 52px; } .levels-grid { grid-template-columns: repeat(2, 1fr); } .overlay-card { padding: 32px 34px; } .category-title { font-size: 20px; } }
+    @media (max-width: 700px) { .hint { display: none; } .menu-title { font-size: 52px; } .levels-grid { grid-template-columns: repeat(5, 1fr); } .overlay-card { padding: 32px 34px; } .category-title { font-size: 18px; } .controls { gap: 6px; } .controls button.btn { padding: 10px 14px; } }
 </style>
 </head>
 <body>
@@ -109,11 +82,11 @@
         <div class="pill"><span class="icon">⭐</span>Счёт: <span id="score">0</span></div>
         <div class="pill"><span class="icon">🏝️</span><span id="levelNameHud">Уровень</span></div>
     </div>
-    <div class="hint" id="hint" style="display:none;">🎯 Потяни птицу и отпусти.<br>💥 Клик во время полёта — способность!</div>
+    <div class="hint" id="hint" style="display:none;">🎯 Потяни птицу и отпусти.<br>💥 Клик — способность!<br>🌊 Лужи: птица тонет, свиньи плавают!</div>
     <div class="ability-indicator" id="abilityIndicator"><span id="abilityIcon">⚡</span><span id="abilityText">Клик!</span></div>
     <div class="controls" id="controls" style="display:none;">
         <button class="btn btn-menu" id="menuBtn">☰ Меню</button>
-        <button class="btn btn-restart" id="restartBtn">🔄</button>
+        <button class="btn btn-restart" id="restartBtn">🔄 Заново</button>
     </div>
     <div class="overlay" id="overlay">
         <div class="overlay-card">
@@ -122,12 +95,11 @@
             <div class="overlay-score">Очки: <span id="overlayScore">0</span></div>
             <div class="overlay-buttons">
                 <button class="btn btn-play" id="playAgainBtn">🔄 Ещё раз</button>
-                <button class="btn btn-menu" id="nextLevelBtn" style="display:none;">▶ Далее</button>
+                <button class="btn btn-play" id="nextOverlayBtn" style="display:none; background: linear-gradient(180deg, #4dabf7, #1971c2);">▶ Следующий</button>
                 <button class="btn btn-menu" id="overlayMenuBtn">🏠 Меню</button>
             </div>
         </div>
     </div>
-    
     <div class="menu-screen show" id="menuScreen">
         <div class="menu-title">ANGRY BIRDS</div>
         <div class="menu-subtitle">Ultimate Edition</div>
@@ -138,19 +110,16 @@
             <button class="menu-btn settings" id="settingsBtn">⚙️ Настройки</button>
         </div>
     </div>
-    
     <div class="levels-screen" id="levelsScreen">
         <div class="levels-header"><div class="levels-title">Уровни</div><button class="btn-back" id="backBtn">← Назад</button></div>
-        <div id="levelsContainer" style="width: min(900px, 100%);"></div>
+        <div id="levelsContainer" style="width: min(1000px, 100%);"></div>
     </div>
-
     <div class="levels-screen" id="achievementsScreen" style="z-index: 115;">
         <div class="levels-header"><div class="levels-title">🏆 Награды</div><button class="btn-back" id="achBackBtn">← Назад</button></div>
         <div class="levels-grid" id="achievementsGrid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));"></div>
     </div>
-
     <div class="settings-screen" id="settingsScreen">
-        <div class="levels-header" style="position: absolute; top: 30px; width: min(900px, 100%);">
+        <div class="levels-header" style="position: absolute; top: 24px; width: min(1000px, 100%);">
             <div class="levels-title">⚙️ Настройки</div>
             <button class="btn-back" id="settingsBackBtn">← Назад</button>
         </div>
@@ -160,11 +129,11 @@
             <div class="setting-row"><span>⚙️ Идеальная физика</span><button class="setting-btn on" id="physicsToggle">Вкл</button></div>
             <div class="setting-row"><span>✨ Графика</span><button class="setting-btn on" id="graphicsToggle">Высокая</button></div>
             <div class="setting-row"><span>📺 FPS Счётчик</span><button class="setting-btn on" id="fpsToggle">Вкл</button></div>
+            <div class="setting-row"><span>🔓 Все уровни</span><button class="setting-btn off" id="unlockAllBtn">Выкл</button></div>
             <div class="setting-row"><span>👤 Авторы</span><button class="setting-btn neutral" id="authorsBtn">Открыть</button></div>
             <div class="setting-row"><span>💾 Сохранение</span><button class="setting-btn off" id="resetSaveBtn">Сбросить</button></div>
         </div>
     </div>
-
     <div class="levels-screen" id="creditsScreen" style="z-index: 125; justify-content: center; background: rgba(10,14,39,0.95);">
         <div class="levels-title" style="margin-bottom: 20px;">Создатели</div>
         <div style="color: white; font-size: 24px; line-height: 2; text-align: center; font-weight: bold;">
@@ -183,121 +152,37 @@ const $ = id => document.getElementById(id);
 const scoreEl = $('score'), levelNameHud = $('levelNameHud'), hud = $('hud'), controls = $('controls'), hint = $('hint');
 const abilityIndicator = $('abilityIndicator'), abilityIcon = $('abilityIcon'), abilityText = $('abilityText');
 const overlay = $('overlay'), overlayTitle = $('overlayTitle'), overlayStars = $('overlayStars'), overlayScore = $('overlayScore');
-const playAgainBtn = $('playAgainBtn'), nextLevelBtn = $('nextLevelBtn'), overlayMenuBtn = $('overlayMenuBtn'), restartBtn = $('restartBtn'), menuBtn = $('menuBtn');
+const playAgainBtn = $('playAgainBtn'), nextOverlayBtn = $('nextOverlayBtn'), overlayMenuBtn = $('overlayMenuBtn');
+const restartBtn = $('restartBtn'), menuBtn = $('menuBtn');
 const menuScreen = $('menuScreen'), levelsScreen = $('levelsScreen'), levelsContainer = $('levelsContainer'), playBtn = $('playBtn'), levelsBtn = $('levelsBtn'), backBtn = $('backBtn');
 const achievementsBtn = $('achievementsBtn'), achievementsScreen = $('achievementsScreen'), achievementsGrid = $('achievementsGrid'), achBackBtn = $('achBackBtn');
 const settingsBtn = $('settingsBtn'), settingsScreen = $('settingsScreen'), settingsBackBtn = $('settingsBackBtn');
-const musicToggle = $('musicToggle'), soundToggle = $('soundToggle'), physicsToggle = $('physicsToggle'), graphicsToggle = $('graphicsToggle'), fpsToggle = $('fpsToggle'), authorsBtn = $('authorsBtn'), resetSaveBtn = $('resetSaveBtn');
+const musicToggle = $('musicToggle'), soundToggle = $('soundToggle'), physicsToggle = $('physicsToggle'), graphicsToggle = $('graphicsToggle'), fpsToggle = $('fpsToggle'), unlockAllBtn = $('unlockAllBtn'), authorsBtn = $('authorsBtn'), resetSaveBtn = $('resetSaveBtn');
 const creditsScreen = $('creditsScreen'), creditsBackBtn = $('creditsBackBtn');
 const fpsCounter = $('fps-counter');
 
-const SAVE_KEY = 'angryBirds_ultimate_v23';
-const SETTINGS_KEY = 'angryBirds_settings_v8';
+const SAVE_KEY = 'angryBirds_ultimate_v60';
+const SETTINGS_KEY = 'angryBirds_settings_v40';
 
-let settings = { music: true, sound: true, perfectPhysics: true, highGraphics: true, showFps: true };
-function loadSettings() { try { const r = localStorage.getItem(SETTINGS_KEY); if (r) settings = Object.assign(settings, JSON.parse(r)); } catch(e) {} }
-function saveSettings() { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); updateSettingsUI(); }
-function updateSettingsUI() {
-    musicToggle.textContent = settings.music ? 'Вкл' : 'Выкл'; musicToggle.className = 'setting-btn ' + (settings.music ? 'on' : 'off');
-    soundToggle.textContent = settings.sound ? 'Вкл' : 'Выкл'; soundToggle.className = 'setting-btn ' + (settings.sound ? 'on' : 'off');
-    physicsToggle.textContent = settings.perfectPhysics ? 'Вкл' : 'Выкл'; physicsToggle.className = 'setting-btn ' + (settings.perfectPhysics ? 'on' : 'off');
-    graphicsToggle.textContent = settings.highGraphics ? 'Высокая' : 'Низкая'; graphicsToggle.className = 'setting-btn ' + (settings.highGraphics ? 'on' : 'off');
-    fpsToggle.textContent = settings.showFps ? 'Вкл' : 'Выкл'; fpsToggle.className = 'setting-btn ' + (settings.showFps ? 'on' : 'off');
-    fpsCounter.style.display = settings.showFps ? 'block' : 'none';
-}
+const GRAVITY = 0.42;
+const AIR = 0.9992;
+const GROUND_Y = H - 78;
+const MAX_PULL = 140;
+const LAUNCH_MULT = 0.30;
+const PHYS_SUBSTEPS = 8;
 
-let saveData = { levels: {}, achievements: {}, stats: { birds: 0, pigs: 0, blocks: 0, abilities: 0 } };
-function loadSave() { try { const r = localStorage.getItem(SAVE_KEY); if (r) { saveData = JSON.parse(r); if (!saveData.stats) saveData.stats = { birds: 0, pigs: 0, blocks: 0, abilities: 0 }; } } catch(e) {} }
-function saveGame() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(saveData)); } catch(e) {} }
-
-const ACHIEVEMENTS = {
-    firstWin: { icon: '🎯', name: 'Первая победа', desc: 'Пройди 1 уровень', cond: () => Object.keys(saveData.levels).length >= 1 },
-    threeStars: { icon: '⭐', name: 'Идеально!', desc: 'Получи 3 звезды', cond: () => Object.values(saveData.levels).some(l => l.stars === 3) },
-    tenLvls: { icon: '🏆', name: 'Опытный', desc: 'Пройди 10 уровней', cond: () => Object.keys(saveData.levels).length >= 10 },
-    allLvls: { icon: '👑', name: 'Мастер', desc: 'Пройди все 25 уровней', cond: () => Object.keys(saveData.levels).length >= 25 },
-    pig100: { icon: '🐷', name: 'Охотник', desc: 'Убей 100 свиней', cond: () => saveData.stats.pigs >= 100 },
-    pig300: { icon: '💀', name: 'Истребитель', desc: 'Убей 300 свиней', cond: () => saveData.stats.pigs >= 300 },
-    bird200: { icon: '🐦', name: 'Птицелов', desc: 'Запусти 200 птиц', cond: () => saveData.stats.birds >= 200 },
-    block300: { icon: '🪓', name: 'Разрушитель', desc: 'Сломай 300 блоков', cond: () => saveData.stats.blocks >= 300 },
-    ability50: { icon: '⚡', name: 'Мастер силы', desc: 'Используй 50 способностей', cond: () => saveData.stats.abilities >= 50 },
-    allStars: { icon: '🌟', name: 'Перфекционист', desc: 'Собери 60 звёзд', cond: () => { let t=0; Object.values(saveData.levels).forEach(l=>t+=l.stars||0); return t>=60; } }
-};
-let achQueue = [];
-function checkAchievements() {
-    let n = false; for (const [id, a] of Object.entries(ACHIEVEMENTS)) { if (!saveData.achievements[id] && a.cond()) { saveData.achievements[id] = true; achQueue.push(a); n = true; } }
-    if (n) { saveGame(); processAchQueue(); }
-}
-function processAchQueue() {
-    if (!achQueue.length) return; const a = achQueue.shift();
-    const t = document.createElement('div'); t.className = 'toast-ach';
-    t.innerHTML = `<span style="font-size:32px;">${a.icon}</span><div><div style="font-size:11px; opacity:0.7;">🏆 ДОСТИЖЕНИЕ</div><div>${a.name}</div><div style="font-size:11px; opacity:0.6; font-weight:600;">${a.desc}</div></div>`;
-    document.body.appendChild(t); requestAnimationFrame(() => t.classList.add('show')); SFX.star();
-    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 500); }, 3500); setTimeout(processAchQueue, 4000);
-}
-
-const BIOMES = {
-    day:    { name: 'День', skyTop: '#87CEEB', skyMid: '#B0E0FF', skyBot: '#E0F6FF', ground1: '#7bc043', ground2: '#3f7a22', mountain: 'rgba(100,150,200,0.3)', icon: '☀️' },
-    sunset: { name: 'Утро', skyTop: '#1a2151', skyMid: '#3d4d8c', skyBot: '#ffd89b', ground1: '#7bc043', ground2: '#3f7a22', mountain: 'rgba(60,50,110,0.55)', icon: '🌅' },
-    desert: { name: 'Пустыня', skyTop: '#f6d365', skyMid: '#fda085', skyBot: '#ffedbc', ground1: '#f0c27b', ground2: '#9c6b3e', mountain: 'rgba(180,120,80,0.5)', icon: '🏜️' },
-    night:  { name: 'Ночь', skyTop: '#0f0c29', skyMid: '#302b63', skyBot: '#24243e', ground1: '#2d5a27', ground2: '#1a3a15', mountain: 'rgba(20,15,50,0.8)', icon: '🌙' },
-    ice:    { name: 'Зима', skyTop: '#83a4d4', skyMid: '#b6fbff', skyBot: '#ffffff', ground1: '#e0f7fa', ground2: '#80deea', mountain: 'rgba(150,180,200,0.5)', icon: '❄️' }
-};
-
-const GRAVITY = 0.45, AIR = 0.9985, GROUND_Y = H - 78, MAX_PULL = 130, LAUNCH_MULT = 0.20;
-let state = { phase: 'menu', score: 0, dragging: false, time: 0, launchTime: 0, shake: 0, shakeX: 0, shakeY: 0, currentLevel: 0, birdsUsed: 0, abilitiesUsed: 0 };
-let bird = null, birds = [], pigs = [], blocks = [], eggs = [], particles = [], feathers = [], floatingTexts = [], clouds = [], stars = [];
-const slingshot = { x: 165, y: GROUND_Y - 90, forkLeft: { x: 148, y: GROUND_Y - 115 }, forkRight: { x: 190, y: GROUND_Y - 105 } };
-let audioCtx = null, lastAbilityTime = 0, musicTimer = null;
-const rand = (a, b) => a + Math.random() * (b - a), randInt = (a, b) => Math.floor(rand(a, b + 1)), clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t, dist = (x1, y1, x2, y2) => Math.hypot(x1 - x2, y1 - y2);
-
-// --- АУДИО И МУЗЫКА (8-bit) ---
-function ensureAudio() { if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} } }
-function beep(f, d, t='sine', v=0.15, s=null) {
-    if (!settings.sound || !audioCtx) return;
-    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime); if (s) o.frequency.exponentialRampToValueAtTime(s, audioCtx.currentTime + d);
-    g.gain.setValueAtTime(v, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + d);
-    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + d);
-}
-const SFX = { launch:()=>beep(420,0.18,'sawtooth',0.18,780), hit:()=>beep(180,0.09,'square',0.2,90), pop:()=>{ beep(700,0.09,'sine',0.2,1200); setTimeout(()=>beep(1200,0.1,'sine',0.15,500),60); }, wood:()=>beep(240,0.1,'triangle',0.18,120), win:()=>{ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,0.22,'triangle',0.16), i*120)); }, lose:()=>{ [400,320,240].forEach((f,i)=>setTimeout(()=>beep(f,0.28,'sine',0.16), i*160)); }, pull:()=>beep(300,0.05,'sine',0.08,500), ability:()=>beep(600,0.15,'sawtooth',0.2,1400), split:()=>{ [500,700,900].forEach((f,i)=>setTimeout(()=>beep(f,0.1,'triangle',0.14),i*40)); }, explosion:()=>{ beep(80,0.5,'sawtooth',0.35,30); beep(200,0.3,'square',0.2,50); }, dash:()=>beep(900,0.2,'sawtooth',0.2,1800), star:()=>{ [800,1000,1200].forEach((f,i)=>setTimeout(()=>beep(f,0.15,'triangle',0.15),i*100)); } };
-
-// Генератор музыки
-function playMusicNote(freq, duration, vol=0.05, type='square') {
-    if (!audioCtx || !settings.music) return;
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    o.type = type;
-    o.frequency.value = freq;
-    g.gain.setValueAtTime(vol, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-    o.connect(g);
-    g.connect(audioCtx.destination);
-    o.start();
-    o.stop(audioCtx.currentTime + duration);
-}
-
-function startMusic() {
-    if (musicTimer) return;
-    ensureAudio();
-    if (!audioCtx) return;
-    
-    const melody = [440, 493.88, 523.25, 587.33, 659.25, 587.33, 523.25, 493.88];
-    const bass = [110, 110, 130.81, 130.81, 146.83, 146.83, 164.81, 164.81];
-    
-    let step = 0;
-    musicTimer = setInterval(() => {
-        if (!settings.music) return;
-        playMusicNote(melody[step % melody.length], 0.2, 0.04, 'square');
-        if (step % 2 === 0) playMusicNote(bass[Math.floor(step / 2) % bass.length], 0.4, 0.08, 'triangle');
-        if (step % 2 === 0) playMusicNote(100, 0.1, 0.1, 'sawtooth');
-        step++;
-    }, 250);
-}
-
-function stopMusic() {
-    if (musicTimer) {
-        clearInterval(musicTimer);
-        musicTimer = null;
+function stepFlight(b) {
+    const sub = 1 / PHYS_SUBSTEPS;
+    for (let i = 0; i < PHYS_SUBSTEPS; i++) {
+        const sp = Math.hypot(b.vx, b.vy);
+        if (settings.perfectPhysics && sp > 0.01) {
+            const drag = 1 - 0.00018 * sp;
+            b.vx *= drag;
+            b.vy *= drag;
+        }
+        b.vy += GRAVITY * sub;
+        b.x += b.vx * sub;
+        b.y += b.vy * sub;
     }
 }
 
@@ -309,115 +194,268 @@ const BIRD_TYPES = {
     white:  { name: 'Матильда', icon: '⚪', color1: '#ffffff', color2: '#e0e0e0', color3: '#90a4ae', belly: 'rgba(240,240,240,0.8)', r: 21, ability: 'drop', abilityName: 'Бомба' }
 };
 
+let settings = { music: true, sound: true, perfectPhysics: true, highGraphics: true, showFps: true, unlockAll: false };
+let saveData = { levels: {}, achievements: {}, stats: { birds: 0, pigs: 0, blocks: 0, abilities: 0, drowned: 0 } };
+
+function loadSettings() { try { const r = localStorage.getItem(SETTINGS_KEY); if (r) settings = Object.assign(settings, JSON.parse(r)); } catch(e) {} }
+function saveSettings() { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); updateSettingsUI(); }
+function updateSettingsUI() {
+    musicToggle.textContent = settings.music ? 'Вкл' : 'Выкл'; musicToggle.className = 'setting-btn ' + (settings.music ? 'on' : 'off');
+    soundToggle.textContent = settings.sound ? 'Вкл' : 'Выкл'; soundToggle.className = 'setting-btn ' + (settings.sound ? 'on' : 'off');
+    physicsToggle.textContent = settings.perfectPhysics ? 'Вкл' : 'Выкл'; physicsToggle.className = 'setting-btn ' + (settings.perfectPhysics ? 'on' : 'off');
+    graphicsToggle.textContent = settings.highGraphics ? 'Высокая' : 'Низкая'; graphicsToggle.className = 'setting-btn ' + (settings.highGraphics ? 'on' : 'off');
+    fpsToggle.textContent = settings.showFps ? 'Вкл' : 'Выкл'; fpsToggle.className = 'setting-btn ' + (settings.showFps ? 'on' : 'off');
+    unlockAllBtn.textContent = settings.unlockAll ? 'Вкл' : 'Выкл'; unlockAllBtn.className = 'setting-btn ' + (settings.unlockAll ? 'on' : 'off');
+    fpsCounter.style.display = settings.showFps ? 'block' : 'none';
+}
+
+function loadSave() { try { const r = localStorage.getItem(SAVE_KEY); if (r) { saveData = JSON.parse(r); if (!saveData.stats) saveData.stats = { birds: 0, pigs: 0, blocks: 0, abilities: 0, drowned: 0 }; } } catch(e) {} }
+function saveGame() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(saveData)); } catch(e) {} }
+
+let currentBirdQueue = [], currentLevelIdx = 0;
+let state = { phase: 'menu', score: 0, dragging: false, time: 0, launchTime: 0, shake: 0, shakeX: 0, shakeY: 0, birdsUsed: 0, abilitiesUsed: 0 };
+let bird = null, birds = [], pigs = [], blocks = [], eggs = [], particles = [], feathers = [], floatingTexts = [], clouds = [], stars = [], puddles = [];
+const slingshot = { x: 165, y: GROUND_Y - 90, forkLeft: { x: 148, y: GROUND_Y - 115 }, forkRight: { x: 190, y: GROUND_Y - 105 } };
+let audioCtx = null, lastAbilityTime = 0, musicTimer = null;
+const rand = (a, b) => a + Math.random() * (b - a), randInt = (a, b) => Math.floor(rand(a, b + 1)), clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t, dist = (x1, y1, x2, y2) => Math.hypot(x1 - x2, y1 - y2);
+
+const ACHIEVEMENTS = {
+    firstWin: { icon: '🎯', name: 'Первая победа', desc: 'Пройди 1 уровень', cond: () => Object.keys(saveData.levels).length >= 1 },
+    threeStars: { icon: '⭐', name: 'Идеально!', desc: 'Получи 3 звезды', cond: () => Object.values(saveData.levels).some(l => l.stars === 3) },
+    tenLvls: { icon: '🏆', name: 'Опытный', desc: 'Пройди 10 уровней', cond: () => Object.keys(saveData.levels).length >= 10 },
+    allLvls: { icon: '👑', name: 'Мастер', desc: 'Пройди все уровни', cond: () => Object.keys(saveData.levels).length >= LEVELS.length },
+    pig100: { icon: '🐷', name: 'Охотник', desc: 'Убей 100 свиней', cond: () => saveData.stats.pigs >= 100 },
+    pig300: { icon: '💀', name: 'Истребитель', desc: 'Убей 300 свиней', cond: () => saveData.stats.pigs >= 300 },
+    bird200: { icon: '🐦', name: 'Птицелов', desc: 'Запусти 200 птиц', cond: () => saveData.stats.birds >= 200 },
+    block300: { icon: '🪓', name: 'Разрушитель', desc: 'Сломай 300 блоков', cond: () => saveData.stats.blocks >= 300 },
+    ability50: { icon: '⚡', name: 'Мастер силы', desc: 'Используй 50 способностей', cond: () => saveData.stats.abilities >= 50 },
+    drown: { icon: '🌊', name: 'Утопленник', desc: 'Утопи птицу в болоте', cond: () => saveData.stats.drowned >= 1 },
+    allStars: { icon: '🌟', name: 'Перфекционист', desc: 'Собери 60 звёзд', cond: () => { let t=0; Object.values(saveData.levels).forEach(l=>t+=l.stars||0); return t>=60; } }
+};
+
+const BIOMES = {
+    day:    { name: 'День', skyTop: '#87CEEB', skyMid: '#B0E0FF', skyBot: '#E0F6FF', ground1: '#7bc043', ground2: '#3f7a22', mountain: 'rgba(100,150,200,0.3)', icon: '☀️' },
+    sunset: { name: 'Утро', skyTop: '#1a2151', skyMid: '#3d4d8c', skyBot: '#ffd89b', ground1: '#7bc043', ground2: '#3f7a22', mountain: 'rgba(60,50,110,0.55)', icon: '🌅' },
+    desert: { name: 'Пустыня', skyTop: '#f6d365', skyMid: '#fda085', skyBot: '#ffedbc', ground1: '#f0c27b', ground2: '#9c6b3e', mountain: 'rgba(180,120,80,0.5)', icon: '🏜️' },
+    night:  { name: 'Ночь', skyTop: '#0f0c29', skyMid: '#302b63', skyBot: '#24243e', ground1: '#2d5a27', ground2: '#1a3a15', mountain: 'rgba(20,15,50,0.8)', icon: '🌙' },
+    ice:    { name: 'Зима', skyTop: '#83a4d4', skyMid: '#b6fbff', skyBot: '#ffffff', ground1: '#e0f7fa', ground2: '#80deea', mountain: 'rgba(150,180,200,0.5)', icon: '❄️' },
+    swamp:  { name: 'Болото', skyTop: '#3a4a2e', skyMid: '#5c6b45', skyBot: '#a8b58a', ground1: '#4a5a32', ground2: '#2a3a1a', mountain: 'rgba(30,45,25,0.7)', icon: '🌿', foggy: true }
+};
+
 const LEVELS = [
-    // День
-    { name: 'Разминка', biome: 'day', birds: ['red', 'red', 'red'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 800, y: GROUND_Y - 26, r: 26, type: 'normal' }], blocks: [{ x: 680, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 780, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 670, y: GROUND_Y - 132, w: 145, h: 22, type: 'wood' }] },
-    { name: 'Знакомство', biome: 'day', birds: ['red', 'yellow', 'red'], pigs: [{ x: 720, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 830, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 775, y: GROUND_Y - 100, r: 24, type: 'normal' }], blocks: [{ x: 700, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 820, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 690, y: GROUND_Y - 132, w: 165, h: 22, type: 'wood' }, { x: 740, y: GROUND_Y - 190, w: 20, h: 60, type: 'wood' }, { x: 790, y: GROUND_Y - 190, w: 20, h: 60, type: 'wood' }] },
-    { name: 'Разделённые', biome: 'day', birds: ['blue', 'blue', 'red'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 780, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 860, y: GROUND_Y - 26, r: 24, type: 'normal' }], blocks: [{ x: 680, y: GROUND_Y - 80, w: 18, h: 80, type: 'wood' }, { x: 760, y: GROUND_Y - 80, w: 18, h: 80, type: 'wood' }, { x: 840, y: GROUND_Y - 80, w: 18, h: 80, type: 'wood' }, { x: 670, y: GROUND_Y - 100, w: 200, h: 20, type: 'wood' }] },
-    
-    // Утро (Закат)
-    { name: 'Закат Империи', biome: 'sunset', birds: ['red', 'yellow', 'black', 'blue', 'white', 'black'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 800, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 900, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 750, y: GROUND_Y - 120, r: 24, type: 'normal' }, { x: 850, y: GROUND_Y - 120, r: 24, type: 'normal' }, { x: 800, y: GROUND_Y - 240, r: 24, type: 'normal' }], blocks: [{ x: 680, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 780, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 880, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 670, y: GROUND_Y - 122, w: 245, h: 22, type: 'wood' }, { x: 730, y: GROUND_Y - 200, w: 20, h: 78, type: 'wood' }, { x: 830, y: GROUND_Y - 200, w: 20, h: 78, type: 'wood' }, { x: 720, y: GROUND_Y - 220, w: 130, h: 20, type: 'stone' }, { x: 750, y: GROUND_Y - 290, w: 18, h: 70, type: 'wood' }, { x: 810, y: GROUND_Y - 290, w: 18, h: 70, type: 'wood' }, { x: 740, y: GROUND_Y - 308, w: 100, h: 18, type: 'wood' }] },
-    { name: 'Финальная битва', biome: 'sunset', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red', 'black'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 800, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 900, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 130, r: 22, type: 'normal' }, { x: 850, y: GROUND_Y - 130, r: 22, type: 'normal' }, { x: 800, y: GROUND_Y - 230, r: 26, type: 'normal' }, { x: 700, y: GROUND_Y - 230, r: 20, type: 'normal' }, { x: 900, y: GROUND_Y - 230, r: 20, type: 'normal' }, { x: 800, y: GROUND_Y - 340, r: 22, type: 'normal' }], blocks: [{ x: 660, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 760, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 860, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 650, y: GROUND_Y - 132, w: 256, h: 22, type: 'stone' }, { x: 690, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 790, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 890, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 680, y: GROUND_Y - 232, w: 245, h: 22, type: 'wood' }, { x: 720, y: GROUND_Y - 310, w: 20, h: 78, type: 'wood' }, { x: 870, y: GROUND_Y - 310, w: 20, h: 78, type: 'wood' }, { x: 710, y: GROUND_Y - 330, w: 190, h: 20, type: 'stone' }, { x: 780, y: GROUND_Y - 400, w: 60, h: 70, type: 'stone' }] },
-    { name: 'Разрушитель', biome: 'sunset', birds: ['black', 'black', 'black'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 20, type: 'normal' }, { x: 800, y: GROUND_Y - 120, r: 20, type: 'normal' }, { x: 800, y: GROUND_Y - 220, r: 20, type: 'normal' }], blocks: [{ x: 700, y: GROUND_Y - 80, w: 30, h: 80, type: 'glass' }, { x: 870, y: GROUND_Y - 80, w: 30, h: 80, type: 'glass' }, { x: 690, y: GROUND_Y - 100, w: 220, h: 20, type: 'wood' }, { x: 750, y: GROUND_Y - 180, w: 20, h: 80, type: 'glass' }, { x: 830, y: GROUND_Y - 180, w: 20, h: 80, type: 'glass' }, { x: 740, y: GROUND_Y - 200, w: 120, h: 20, type: 'wood' }, { x: 780, y: GROUND_Y - 280, w: 40, h: 80, type: 'glass' }] },
-    { name: 'Королевский бастион', biome: 'sunset', birds: ['black', 'black', 'white', 'blue', 'blue', 'red', 'yellow', 'black'], pigs: [{ x: 800, y: GROUND_Y - 36, r: 36, type: 'boss' }, { x: 680, y: GROUND_Y - 126, r: 20, type: 'helmet' }, { x: 920, y: GROUND_Y - 126, r: 20, type: 'helmet' }, { x: 640, y: GROUND_Y - 26, r: 20, type: 'normal' }, { x: 720, y: GROUND_Y - 26, r: 20, type: 'normal' }, { x: 880, y: GROUND_Y - 26, r: 20, type: 'normal' }], blocks: [{ x: 720, y: GROUND_Y - 140, w: 160, h: 20, type: 'stone' }, { x: 720, y: GROUND_Y - 60, w: 20, h: 40, type: 'stone' }, { x: 860, y: GROUND_Y - 60, w: 20, h: 40, type: 'stone' }, { x: 740, y: GROUND_Y - 140, w: 20, h: 80, type: 'glass' }, { x: 840, y: GROUND_Y - 140, w: 20, h: 80, type: 'glass' }, { x: 660, y: GROUND_Y - 120, w: 30, h: 20, type: 'wood' }, { x: 660, y: GROUND_Y - 40, w: 10, h: 20, type: 'wood' }, { x: 910, y: GROUND_Y - 120, w: 30, h: 20, type: 'wood' }, { x: 930, y: GROUND_Y - 40, w: 10, h: 20, type: 'wood' }, { x: 600, y: GROUND_Y - 40, w: 80, h: 20, type: 'stone' }, { x: 680, y: GROUND_Y - 40, w: 80, h: 20, type: 'stone' }, { x: 760, y: GROUND_Y - 40, w: 80, h: 20, type: 'stone' }, { x: 840, y: GROUND_Y - 40, w: 80, h: 20, type: 'stone' }] },
-    { name: 'Стеклянный дом', biome: 'sunset', birds: ['red', 'yellow', 'blue'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26, type: 'normal' }], blocks: [{ x: 700, y: GROUND_Y - 100, w: 20, h: 100, type: 'glass' }, { x: 780, y: GROUND_Y - 100, w: 20, h: 100, type: 'glass' }, { x: 860, y: GROUND_Y - 100, w: 20, h: 100, type: 'glass' }, { x: 680, y: GROUND_Y - 120, w: 220, h: 20, type: 'glass' }, { x: 710, y: GROUND_Y - 200, w: 20, h: 80, type: 'glass' }, { x: 850, y: GROUND_Y - 200, w: 20, h: 80, type: 'glass' }, { x: 690, y: GROUND_Y - 220, w: 180, h: 20, type: 'glass' }] },
+    // День (8)
+    { name: 'Разминка', biome: 'day', birds: ['red', 'red', 'red'], pigs: [{ x: 720, y: GROUND_Y - 26, r: 26 }, { x: 840, y: GROUND_Y - 26, r: 26 }], blocks: [{ x: 700, y: GROUND_Y - 120, w: 24, h: 120, type: 'wood' }, { x: 816, y: GROUND_Y - 120, w: 24, h: 120, type: 'wood' }, { x: 680, y: GROUND_Y - 144, w: 180, h: 24, type: 'wood' }] },
+    { name: 'Знакомство', biome: 'day', birds: ['red', 'yellow', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 26 }, { x: 870, y: GROUND_Y - 26, r: 26 }, { x: 810, y: GROUND_Y - 144, r: 24 }], blocks: [{ x: 720, y: GROUND_Y - 120, w: 24, h: 120, type: 'wood' }, { x: 840, y: GROUND_Y - 120, w: 24, h: 120, type: 'wood' }, { x: 700, y: GROUND_Y - 144, w: 184, h: 24, type: 'wood' }, { x: 770, y: GROUND_Y - 240, w: 24, h: 96, type: 'wood' }, { x: 820, y: GROUND_Y - 240, w: 24, h: 96, type: 'wood' }, { x: 750, y: GROUND_Y - 264, w: 114, h: 24, type: 'wood' }] },
+    { name: 'Разделённые', biome: 'day', birds: ['blue', 'blue', 'red'], pigs: [{ x: 710, y: GROUND_Y - 26, r: 24 }, { x: 830, y: GROUND_Y - 26, r: 24 }, { x: 950, y: GROUND_Y - 26, r: 24 }], blocks: [{ x: 680, y: GROUND_Y - 100, w: 22, h: 100, type: 'stone' }, { x: 800, y: GROUND_Y - 100, w: 22, h: 100, type: 'stone' }, { x: 920, y: GROUND_Y - 100, w: 22, h: 100, type: 'stone' }, { x: 660, y: GROUND_Y - 122, w: 304, h: 22, type: 'wood' }] },
+    { name: 'Трио', biome: 'day', birds: ['red', 'yellow', 'black'], pigs: [{ x: 740, y: GROUND_Y - 26, r: 24 }, { x: 860, y: GROUND_Y - 26, r: 24 }, { x: 800, y: GROUND_Y - 160, r: 24 }], blocks: [{ x: 720, y: GROUND_Y - 130, w: 24, h: 130, type: 'wood' }, { x: 840, y: GROUND_Y - 130, w: 24, h: 130, type: 'wood' }, { x: 700, y: GROUND_Y - 154, w: 184, h: 24, type: 'stone' }, { x: 770, y: GROUND_Y - 240, w: 20, h: 86, type: 'wood' }, { x: 820, y: GROUND_Y - 240, w: 20, h: 86, type: 'wood' }, { x: 750, y: GROUND_Y - 260, w: 110, h: 20, type: 'wood' }] },
+    { name: 'Высотка', biome: 'day', birds: ['red', 'yellow', 'black', 'blue'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 24 }, { x: 850, y: GROUND_Y - 26, r: 24 }, { x: 800, y: GROUND_Y - 250, r: 24 }], blocks: [{ x: 700, y: GROUND_Y - 150, w: 24, h: 150, type: 'stone' }, { x: 840, y: GROUND_Y - 150, w: 24, h: 150, type: 'stone' }, { x: 680, y: GROUND_Y - 174, w: 204, h: 24, type: 'stone' }, { x: 740, y: GROUND_Y - 240, w: 20, h: 66, type: 'wood' }, { x: 850, y: GROUND_Y - 240, w: 20, h: 66, type: 'wood' }, { x: 720, y: GROUND_Y - 260, w: 170, h: 20, type: 'stone' }, { x: 770, y: GROUND_Y - 320, w: 20, h: 60, type: 'wood' }, { x: 820, y: GROUND_Y - 320, w: 20, h: 60, type: 'wood' }, { x: 750, y: GROUND_Y - 340, w: 110, h: 20, type: 'stone' }] },
+    { name: 'Стеклянный замок', biome: 'day', birds: ['yellow', 'blue', 'blue'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26 }, { x: 750, y: GROUND_Y - 160, r: 22 }], blocks: [{ x: 700, y: GROUND_Y - 120, w: 20, h: 120, type: 'glass' }, { x: 880, y: GROUND_Y - 120, w: 20, h: 120, type: 'glass' }, { x: 680, y: GROUND_Y - 144, w: 240, h: 24, type: 'glass' }, { x: 740, y: GROUND_Y - 230, w: 20, h: 86, type: 'glass' }, { x: 840, y: GROUND_Y - 230, w: 20, h: 86, type: 'glass' }, { x: 720, y: GROUND_Y - 254, w: 160, h: 24, type: 'glass' }] },
+    { name: 'Бомбардировка', biome: 'day', birds: ['black', 'black', 'black'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 24 }, { x: 850, y: GROUND_Y - 26, r: 24 }, { x: 800, y: GROUND_Y - 200, r: 24 }], blocks: [{ x: 700, y: GROUND_Y - 150, w: 24, h: 150, type: 'stone' }, { x: 880, y: GROUND_Y - 150, w: 24, h: 150, type: 'stone' }, { x: 680, y: GROUND_Y - 174, w: 244, h: 24, type: 'stone' }, { x: 740, y: GROUND_Y - 260, w: 20, h: 86, type: 'wood' }, { x: 840, y: GROUND_Y - 260, w: 20, h: 86, type: 'wood' }, { x: 720, y: GROUND_Y - 284, w: 160, h: 24, type: 'stone' }] },
+    { name: 'Бастион', biome: 'day', birds: ['red', 'yellow', 'black', 'blue', 'white', 'red'], pigs: [{ x: 800, y: GROUND_Y - 36, r: 36, type: 'boss' }, { x: 680, y: GROUND_Y - 26, r: 22 }, { x: 920, y: GROUND_Y - 26, r: 22 }, { x: 800, y: GROUND_Y - 200, r: 22 }], blocks: [{ x: 650, y: GROUND_Y - 100, w: 24, h: 100, type: 'stone' }, { x: 930, y: GROUND_Y - 100, w: 24, h: 100, type: 'stone' }, { x: 630, y: GROUND_Y - 124, w: 344, h: 24, type: 'stone' }, { x: 740, y: GROUND_Y - 240, w: 24, h: 116, type: 'wood' }, { x: 840, y: GROUND_Y - 240, w: 24, h: 116, type: 'wood' }, { x: 720, y: GROUND_Y - 264, w: 164, h: 24, type: 'stone' }] },
 
-    // Пустыня
-    { name: 'Песчаная буря', biome: 'desert', birds: ['black', 'red', 'black'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 800, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 900, y: GROUND_Y - 26, r: 26, type: 'normal' }], blocks: [{ x: 660, y: GROUND_Y - 130, w: 24, h: 130, type: 'stone' }, { x: 760, y: GROUND_Y - 130, w: 24, h: 130, type: 'stone' }, { x: 860, y: GROUND_Y - 130, w: 24, h: 130, type: 'stone' }, { x: 650, y: GROUND_Y - 155, w: 250, h: 25, type: 'stone' }] },
-    { name: 'Каска', biome: 'desert', birds: ['yellow', 'black', 'red'], pigs: [{ x: 730, y: GROUND_Y - 26, r: 26, type: 'helmet' }, { x: 830, y: GROUND_Y - 26, r: 26, type: 'helmet' }], blocks: [{ x: 690, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 790, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 680, y: GROUND_Y - 145, w: 150, h: 25, type: 'stone' }] },
-    { name: 'Песчаный шторм', biome: 'desert', birds: ['white', 'yellow', 'blue', 'black', 'red'], pigs: [{ x: 720, y: GROUND_Y - 26, r: 24, type: 'helmet' }, { x: 820, y: GROUND_Y - 26, r: 24, type: 'helmet' }, { x: 920, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 770, y: GROUND_Y - 150, r: 22, type: 'normal' }, { x: 870, y: GROUND_Y - 150, r: 22, type: 'normal' }], blocks: [{ x: 680, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 790, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 900, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 670, y: GROUND_Y - 132, w: 262, h: 22, type: 'stone' }, { x: 720, y: GROUND_Y - 220, w: 22, h: 88, type: 'wood' }, { x: 820, y: GROUND_Y - 220, w: 22, h: 88, type: 'wood' }, { x: 710, y: GROUND_Y - 240, w: 140, h: 20, type: 'stone' }] },
-    { name: 'Осада', biome: 'desert', birds: ['black', 'black', 'yellow', 'white', 'blue'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26, type: 'helmet' }, { x: 800, y: GROUND_Y - 150, r: 24, type: 'helmet' }, { x: 800, y: GROUND_Y - 280, r: 22, type: 'helmet' }, { x: 650, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 950, y: GROUND_Y - 26, r: 24, type: 'normal' }], blocks: [{ x: 600, y: GROUND_Y - 150, w: 30, h: 150, type: 'stone' }, { x: 1000, y: GROUND_Y - 150, w: 30, h: 150, type: 'stone' }, { x: 740, y: GROUND_Y - 120, w: 20, h: 120, type: 'glass' }, { x: 840, y: GROUND_Y - 120, w: 20, h: 120, type: 'glass' }, { x: 730, y: GROUND_Y - 140, w: 140, h: 20, type: 'stone' }, { x: 770, y: GROUND_Y - 220, w: 20, h: 80, type: 'wood' }, { x: 810, y: GROUND_Y - 220, w: 20, h: 80, type: 'wood' }, { x: 760, y: GROUND_Y - 240, w: 80, h: 20, type: 'stone' }] },
-    { name: 'Ловушка', biome: 'desert', birds: ['black', 'red', 'yellow'], pigs: [{ x: 850, y: GROUND_Y - 26, r: 26, type: 'boss' }], blocks: [{ x: 700, y: GROUND_Y - 150, w: 20, h: 150, type: 'wood' }, { x: 900, y: GROUND_Y - 150, w: 20, h: 150, type: 'wood' }, { x: 690, y: GROUND_Y - 170, w: 240, h: 20, type: 'stone' }, { x: 720, y: GROUND_Y - 250, w: 20, h: 80, type: 'glass' }, { x: 880, y: GROUND_Y - 250, w: 20, h: 80, type: 'glass' }, { x: 710, y: GROUND_Y - 270, w: 200, h: 20, type: 'stone' }] },
+    // Утро (8)
+    { name: 'Закат Империи', biome: 'sunset', birds: ['red', 'yellow', 'black', 'blue', 'white', 'black'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 26 }, { x: 850, y: GROUND_Y - 26, r: 26 }, { x: 800, y: GROUND_Y - 200, r: 26 }, { x: 800, y: GROUND_Y - 350, r: 24 }], blocks: [{ x: 700, y: GROUND_Y - 150, w: 24, h: 150, type: 'wood' }, { x: 880, y: GROUND_Y - 150, w: 24, h: 150, type: 'wood' }, { x: 680, y: GROUND_Y - 174, w: 244, h: 24, type: 'wood' }, { x: 750, y: GROUND_Y - 260, w: 24, h: 86, type: 'stone' }, { x: 830, y: GROUND_Y - 260, w: 24, h: 86, type: 'stone' }, { x: 730, y: GROUND_Y - 284, w: 144, h: 24, type: 'stone' }, { x: 770, y: GROUND_Y - 370, w: 24, h: 86, type: 'wood' }, { x: 810, y: GROUND_Y - 370, w: 24, h: 86, type: 'wood' }, { x: 750, y: GROUND_Y - 394, w: 104, h: 24, type: 'wood' }] },
+    { name: 'Финальная битва', biome: 'sunset', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red', 'black'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24 }, { x: 900, y: GROUND_Y - 26, r: 24 }, { x: 800, y: GROUND_Y - 150, r: 26 }, { x: 800, y: GROUND_Y - 300, r: 26 }, { x: 800, y: GROUND_Y - 450, r: 26 }], blocks: [{ x: 680, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 900, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 660, y: GROUND_Y - 144, w: 284, h: 24, type: 'stone' }, { x: 740, y: GROUND_Y - 220, w: 24, h: 76, type: 'wood' }, { x: 840, y: GROUND_Y - 220, w: 24, h: 76, type: 'wood' }, { x: 720, y: GROUND_Y - 244, w: 164, h: 24, type: 'wood' }, { x: 760, y: GROUND_Y - 340, w: 24, h: 96, type: 'stone' }, { x: 820, y: GROUND_Y - 340, w: 24, h: 96, type: 'stone' }, { x: 740, y: GROUND_Y - 364, w: 124, h: 24, type: 'stone' }] },
+    { name: 'Разрушитель', biome: 'sunset', birds: ['black', 'black', 'black'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 20 }, { x: 800, y: GROUND_Y - 150, r: 20 }, { x: 800, y: GROUND_Y - 270, r: 20 }], blocks: [{ x: 730, y: GROUND_Y - 120, w: 24, h: 120, type: 'glass' }, { x: 846, y: GROUND_Y - 120, w: 24, h: 120, type: 'glass' }, { x: 710, y: GROUND_Y - 144, w: 180, h: 24, type: 'glass' }, { x: 750, y: GROUND_Y - 240, w: 24, h: 96, type: 'glass' }, { x: 826, y: GROUND_Y - 240, w: 24, h: 96, type: 'glass' }, { x: 730, y: GROUND_Y - 264, w: 140, h: 24, type: 'glass' }] },
+    { name: 'Королевский бастион', biome: 'sunset', birds: ['black', 'black', 'white', 'blue', 'blue', 'red', 'yellow', 'black'], pigs: [{ x: 800, y: GROUND_Y - 36, r: 36, type: 'boss' }, { x: 650, y: GROUND_Y - 26, r: 20 }, { x: 950, y: GROUND_Y - 26, r: 20 }, { x: 800, y: GROUND_Y - 200, r: 20 }], blocks: [{ x: 650, y: GROUND_Y - 120, w: 30, h: 120, type: 'stone' }, { x: 920, y: GROUND_Y - 120, w: 30, h: 120, type: 'stone' }, { x: 630, y: GROUND_Y - 144, w: 340, h: 24, type: 'stone' }, { x: 730, y: GROUND_Y - 240, w: 24, h: 96, type: 'glass' }, { x: 846, y: GROUND_Y - 240, w: 24, h: 96, type: 'glass' }, { x: 710, y: GROUND_Y - 264, w: 180, h: 24, type: 'wood' }] },
+    { name: 'Стеклянный дом', biome: 'sunset', birds: ['red', 'yellow', 'blue'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26 }, { x: 800, y: GROUND_Y - 180, r: 24 }], blocks: [{ x: 700, y: GROUND_Y - 100, w: 20, h: 100, type: 'glass' }, { x: 880, y: GROUND_Y - 100, w: 20, h: 100, type: 'glass' }, { x: 680, y: GROUND_Y - 124, w: 240, h: 24, type: 'glass' }, { x: 740, y: GROUND_Y - 220, w: 20, h: 96, type: 'glass' }, { x: 840, y: GROUND_Y - 220, w: 20, h: 96, type: 'glass' }, { x: 720, y: GROUND_Y - 244, w: 160, h: 24, type: 'glass' }] },
+    { name: 'Тени заката', biome: 'sunset', birds: ['yellow', 'blue', 'black', 'red'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24 }, { x: 900, y: GROUND_Y - 26, r: 24 }, { x: 800, y: GROUND_Y - 150, r: 24 }], blocks: [{ x: 680, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 900, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 660, y: GROUND_Y - 134, w: 284, h: 24, type: 'stone' }, { x: 750, y: GROUND_Y - 230, w: 22, h: 96, type: 'wood' }, { x: 830, y: GROUND_Y - 230, w: 22, h: 96, type: 'wood' }, { x: 730, y: GROUND_Y - 254, w: 144, h: 24, type: 'wood' }] },
+    { name: 'Огненный шквал', biome: 'sunset', birds: ['black', 'yellow', 'white', 'blue'], pigs: [{ x: 760, y: GROUND_Y - 26, r: 26 }, { x: 840, y: GROUND_Y - 26, r: 26 }, { x: 800, y: GROUND_Y - 240, r: 26 }], blocks: [{ x: 720, y: GROUND_Y - 130, w: 24, h: 130, type: 'wood' }, { x: 856, y: GROUND_Y - 130, w: 24, h: 130, type: 'wood' }, { x: 700, y: GROUND_Y - 154, w: 200, h: 24, type: 'stone' }, { x: 770, y: GROUND_Y - 260, w: 24, h: 106, type: 'glass' }, { x: 806, y: GROUND_Y - 260, w: 24, h: 106, type: 'glass' }, { x: 750, y: GROUND_Y - 284, w: 100, h: 24, type: 'wood' }] },
+    { name: 'Король', biome: 'sunset', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red', 'black'], pigs: [{ x: 800, y: GROUND_Y - 45, r: 45, type: 'boss' }], blocks: [{ x: 700, y: GROUND_Y - 200, w: 24, h: 200, type: 'stone' }, { x: 900, y: GROUND_Y - 200, w: 24, h: 200, type: 'stone' }, { x: 680, y: GROUND_Y - 224, w: 264, h: 24, type: 'stone' }, { x: 770, y: GROUND_Y - 300, w: 20, h: 76, type: 'glass' }, { x: 810, y: GROUND_Y - 300, w: 20, h: 76, type: 'glass' }] },
 
-    // Ночь
-    { name: 'Тёмная башня', biome: 'night', birds: ['yellow', 'blue', 'black', 'red', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 130, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 230, r: 22, type: 'normal' }, { x: 850, y: GROUND_Y - 26, r: 24, type: 'normal' }], blocks: [{ x: 700, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 800, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 690, y: GROUND_Y - 122, w: 145, h: 22, type: 'wood' }, { x: 710, y: GROUND_Y - 200, w: 20, h: 78, type: 'wood' }, { x: 790, y: GROUND_Y - 200, w: 20, h: 78, type: 'wood' }, { x: 700, y: GROUND_Y - 220, w: 120, h: 20, type: 'stone' }, { x: 730, y: GROUND_Y - 290, w: 18, h: 70, type: 'wood' }, { x: 770, y: GROUND_Y - 290, w: 18, h: 70, type: 'wood' }, { x: 720, y: GROUND_Y - 308, w: 80, h: 18, type: 'wood' }] },
-    { name: 'Луна', biome: 'night', birds: ['black', 'black', 'yellow', 'red'], pigs: [{ x: 720, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 820, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 920, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 770, y: GROUND_Y - 130, r: 24, type: 'normal' }, { x: 870, y: GROUND_Y - 130, r: 24, type: 'normal' }], blocks: [{ x: 680, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 790, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 900, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 670, y: GROUND_Y - 132, w: 262, h: 22, type: 'stone' }, { x: 720, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' }, { x: 820, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' }, { x: 910, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' }, { x: 710, y: GROUND_Y - 218, w: 230, h: 18, type: 'wood' }] },
-    { name: 'Ночной дозор', biome: 'night', birds: ['black', 'black', 'white', 'yellow', 'blue', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 850, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 750, y: GROUND_Y - 140, r: 22, type: 'normal' }, { x: 850, y: GROUND_Y - 140, r: 22, type: 'normal' }, { x: 800, y: GROUND_Y - 250, r: 26, type: 'normal' }, { x: 800, y: GROUND_Y - 360, r: 20, type: 'normal' }], blocks: [{ x: 700, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 800, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 900, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 690, y: GROUND_Y - 145, w: 235, h: 25, type: 'stone' }, { x: 730, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 860, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 720, y: GROUND_Y - 250, w: 175, h: 20, type: 'stone' }, { x: 760, y: GROUND_Y - 330, w: 20, h: 80, type: 'wood' }, { x: 830, y: GROUND_Y - 330, w: 20, h: 80, type: 'wood' }, { x: 750, y: GROUND_Y - 350, w: 110, h: 20, type: 'wood' }] },
-    { name: 'Королевская битва', biome: 'night', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red', 'black'], pigs: [{ x: 800, y: GROUND_Y - 45, r: 45, type: 'boss' }, { x: 700, y: GROUND_Y - 26, r: 22, type: 'helmet' }, { x: 900, y: GROUND_Y - 26, r: 22, type: 'helmet' }], blocks: [{ x: 740, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 840, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 730, y: GROUND_Y - 145, w: 145, h: 25, type: 'stone' }, { x: 780, y: GROUND_Y - 240, w: 20, h: 95, type: 'wood' }, { x: 800, y: GROUND_Y - 240, w: 20, h: 95, type: 'wood' }] },
-    { name: 'Бетонный блок', biome: 'night', birds: ['black', 'white', 'red'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 800, y: GROUND_Y - 150, r: 24, type: 'normal' }], blocks: [{ x: 700, y: GROUND_Y - 100, w: 30, h: 100, type: 'stone' }, { x: 900, y: GROUND_Y - 100, w: 30, h: 100, type: 'stone' }, { x: 690, y: GROUND_Y - 130, w: 250, h: 30, type: 'stone' }, { x: 750, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' }, { x: 830, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' }, { x: 740, y: GROUND_Y - 220, w: 120, h: 20, type: 'stone' }] },
+    // Пустыня (8)
+    { name: 'Песчаная буря', biome: 'desert', birds: ['black', 'red', 'black'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26 }], blocks: [{ x: 700, y: GROUND_Y - 150, w: 24, h: 150, type: 'stone' }, { x: 900, y: GROUND_Y - 150, w: 24, h: 150, type: 'stone' }, { x: 680, y: GROUND_Y - 174, w: 264, h: 24, type: 'stone' }, { x: 740, y: GROUND_Y - 260, w: 20, h: 86, type: 'wood' }, { x: 840, y: GROUND_Y - 260, w: 20, h: 86, type: 'wood' }, { x: 720, y: GROUND_Y - 284, w: 160, h: 24, type: 'stone' }] },
+    { name: 'Каска', biome: 'desert', birds: ['yellow', 'black', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 26, type: 'helmet' }, { x: 850, y: GROUND_Y - 26, r: 26, type: 'helmet' }], blocks: [{ x: 700, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 850, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 680, y: GROUND_Y - 144, w: 214, h: 24, type: 'stone' }, { x: 760, y: GROUND_Y - 240, w: 24, h: 96, type: 'wood' }, { x: 790, y: GROUND_Y - 240, w: 24, h: 96, type: 'wood' }, { x: 740, y: GROUND_Y - 264, w: 94, h: 24, type: 'wood' }] },
+    { name: 'Песчаный шторм', biome: 'desert', birds: ['white', 'yellow', 'blue', 'black', 'red'], pigs: [{ x: 720, y: GROUND_Y - 26, r: 24, type: 'helmet' }, { x: 880, y: GROUND_Y - 26, r: 24, type: 'helmet' }, { x: 800, y: GROUND_Y - 180, r: 22 }], blocks: [{ x: 680, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 880, y: GROUND_Y - 120, w: 24, h: 120, type: 'stone' }, { x: 660, y: GROUND_Y - 144, w: 264, h: 24, type: 'stone' }, { x: 750, y: GROUND_Y - 230, w: 24, h: 86, type: 'wood' }, { x: 810, y: GROUND_Y - 230, w: 24, h: 86, type: 'wood' }, { x: 720, y: GROUND_Y - 254, w: 144, h: 24, type: 'stone' }] },
+    { name: 'Осада', biome: 'desert', birds: ['black', 'black', 'yellow', 'white', 'blue'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26, type: 'helmet' }, { x: 800, y: GROUND_Y - 180, r: 24 }], blocks: [{ x: 650, y: GROUND_Y - 150, w: 30, h: 150, type: 'stone' }, { x: 920, y: GROUND_Y - 150, w: 30, h: 150, type: 'stone' }, { x: 630, y: GROUND_Y - 174, w: 340, h: 24, type: 'stone' }, { x: 740, y: GROUND_Y - 260, w: 20, h: 86, type: 'wood' }, { x: 840, y: GROUND_Y - 260, w: 20, h: 86, type: 'wood' }, { x: 720, y: GROUND_Y - 284, w: 160, h: 24, type: 'stone' }] },
+    { name: 'Ловушка', biome: 'desert', birds: ['black', 'red', 'yellow'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26, type: 'boss' }], blocks: [{ x: 700, y: GROUND_Y - 150, w: 20, h: 150, type: 'wood' }, { x: 880, y: GROUND_Y - 150, w: 20, h: 150, type: 'wood' }, { x: 680, y: GROUND_Y - 174, w: 240, h: 24, type: 'stone' }, { x: 740, y: GROUND_Y - 260, w: 20, h: 86, type: 'glass' }, { x: 840, y: GROUND_Y - 260, w: 20, h: 86, type: 'glass' }, { x: 720, y: GROUND_Y - 284, w: 160, h: 24, type: 'stone' }] },
+    { name: 'Пирамиды', biome: 'desert', birds: ['yellow', 'blue', 'black', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 24 }, { x: 850, y: GROUND_Y - 26, r: 24 }, { x: 800, y: GROUND_Y - 200, r: 22 }], blocks: [{ x: 700, y: GROUND_Y - 130, w: 30, h: 130, type: 'stone' }, { x: 870, y: GROUND_Y - 130, w: 30, h: 130, type: 'stone' }, { x: 680, y: GROUND_Y - 154, w: 240, h: 24, type: 'stone' }, { x: 750, y: GROUND_Y - 230, w: 24, h: 76, type: 'wood' }, { x: 826, y: GROUND_Y - 230, w: 24, h: 76, type: 'wood' }, { x: 730, y: GROUND_Y - 254, w: 140, h: 24, type: 'stone' }] },
+    { name: 'Скорпион', biome: 'desert', birds: ['black', 'white', 'red', 'blue'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 22, type: 'helmet' }, { x: 900, y: GROUND_Y - 26, r: 22, type: 'helmet' }, { x: 800, y: GROUND_Y - 150, r: 22 }], blocks: [{ x: 680, y: GROUND_Y - 100, w: 20, h: 100, type: 'wood' }, { x: 880, y: GROUND_Y - 100, w: 20, h: 100, type: 'wood' }, { x: 660, y: GROUND_Y - 124, w: 264, h: 24, type: 'wood' }, { x: 750, y: GROUND_Y - 210, w: 20, h: 86, type: 'stone' }, { x: 830, y: GROUND_Y - 210, w: 20, h: 86, type: 'stone' }, { x: 730, y: GROUND_Y - 234, w: 140, h: 24, type: 'wood' }] },
+    { name: 'Дюны', biome: 'desert', birds: ['black', 'black', 'black', 'yellow', 'white'], pigs: [{ x: 800, y: GROUND_Y - 45, r: 45, type: 'boss' }], blocks: [{ x: 700, y: GROUND_Y - 200, w: 24, h: 200, type: 'stone' }, { x: 900, y: GROUND_Y - 200, w: 24, h: 200, type: 'stone' }, { x: 680, y: GROUND_Y - 224, w: 264, h: 24, type: 'stone' }, { x: 770, y: GROUND_Y - 310, w: 24, h: 86, type: 'glass' }, { x: 806, y: GROUND_Y - 310, w: 24, h: 86, type: 'glass' }, { x: 750, y: GROUND_Y - 334, w: 100, h: 24, type: 'wood' }] },
+
+    // Ночь (8)
+    { name: 'Тёмная башня', biome: 'night', birds: ['yellow', 'blue', 'black', 'red', 'red'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 24 }, { x: 800, y: GROUND_Y - 160, r: 24 }, { x: 800, y: GROUND_Y - 290, r: 22 }], blocks: [{ x: 750, y: GROUND_Y - 120, w: 20, h: 120, type: 'stone' }, { x: 830, y: GROUND_Y - 120, w: 20, h: 120, type: 'stone' }, { x: 730, y: GROUND_Y - 144, w: 140, h: 24, type: 'stone' }, { x: 760, y: GROUND_Y - 250, w: 20, h: 106, type: 'wood' }, { x: 820, y: GROUND_Y - 250, w: 20, h: 106, type: 'wood' }, { x: 740, y: GROUND_Y - 274, w: 120, h: 24, type: 'wood' }] },
+    { name: 'Луна', biome: 'night', birds: ['black', 'black', 'yellow', 'red'], pigs: [{ x: 720, y: GROUND_Y - 26, r: 26 }, { x: 880, y: GROUND_Y - 26, r: 26 }, { x: 800, y: GROUND_Y - 200, r: 24 }], blocks: [{ x: 680, y: GROUND_Y - 130, w: 24, h: 130, type: 'stone' }, { x: 900, y: GROUND_Y - 130, w: 24, h: 130, type: 'stone' }, { x: 660, y: GROUND_Y - 154, w: 284, h: 24, type: 'stone' }, { x: 740, y: GROUND_Y - 240, w: 24, h: 86, type: 'wood' }, { x: 840, y: GROUND_Y - 240, w: 24, h: 86, type: 'wood' }, { x: 720, y: GROUND_Y - 264, w: 160, h: 24, type: 'stone' }] },
+    { name: 'Ночной дозор', biome: 'night', birds: ['black', 'black', 'white', 'yellow', 'blue', 'red'], pigs: [{ x: 760, y: GROUND_Y - 26, r: 26 }, { x: 840, y: GROUND_Y - 26, r: 26 }, { x: 800, y: GROUND_Y - 260, r: 26 }], blocks: [{ x: 700, y: GROUND_Y - 150, w: 24, h: 150, type: 'stone' }, { x: 880, y: GROUND_Y - 150, w: 24, h: 150, type: 'stone' }, { x: 680, y: GROUND_Y - 174, w: 244, h: 24, type: 'stone' }, { x: 750, y: GROUND_Y - 260, w: 24, h: 86, type: 'wood' }, { x: 830, y: GROUND_Y - 260, w: 24, h: 86, type: 'wood' }, { x: 730, y: GROUND_Y - 284, w: 144, h: 24, type: 'stone' }, { x: 770, y: GROUND_Y - 360, w: 20, h: 76, type: 'wood' }, { x: 810, y: GROUND_Y - 360, w: 20, h: 76, type: 'wood' }, { x: 750, y: GROUND_Y - 384, w: 100, h: 24, type: 'wood' }] },
+    { name: 'Королевская битва', biome: 'night', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red', 'black'], pigs: [{ x: 800, y: GROUND_Y - 45, r: 45, type: 'boss' }, { x: 700, y: GROUND_Y - 26, r: 22 }, { x: 900, y: GROUND_Y - 26, r: 22 }], blocks: [{ x: 740, y: GROUND_Y - 140, w: 24, h: 140, type: 'stone' }, { x: 840, y: GROUND_Y - 140, w: 24, h: 140, type: 'stone' }, { x: 730, y: GROUND_Y - 164, w: 145, h: 24, type: 'stone' }, { x: 780, y: GROUND_Y - 260, w: 20, h: 96, type: 'wood' }, { x: 800, y: GROUND_Y - 260, w: 20, h: 96, type: 'wood' }] },
+    { name: 'Бетонный блок', biome: 'night', birds: ['black', 'white', 'red'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26 }, { x: 800, y: GROUND_Y - 150, r: 24 }], blocks: [{ x: 700, y: GROUND_Y - 100, w: 30, h: 100, type: 'stone' }, { x: 900, y: GROUND_Y - 100, w: 30, h: 100, type: 'stone' }, { x: 690, y: GROUND_Y - 130, w: 250, h: 30, type: 'stone' }, { x: 750, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' }, { x: 830, y: GROUND_Y - 200, w: 20, h: 70, type: 'wood' }, { x: 740, y: GROUND_Y - 220, w: 120, h: 20, type: 'stone' }] },
     { name: 'Последний рубеж', biome: 'night', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red'], pigs: [{ x: 900, y: GROUND_Y - 40, r: 40, type: 'boss' }], blocks: [{ x: 700, y: GROUND_Y - 200, w: 20, h: 200, type: 'stone' }, { x: 850, y: GROUND_Y - 100, w: 100, h: 100, type: 'glass' }] },
+    { name: 'Призрачный замок', biome: 'night', birds: ['yellow', 'blue', 'white'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 24 }, { x: 850, y: GROUND_Y - 26, r: 24 }, { x: 800, y: GROUND_Y - 180, r: 24 }], blocks: [{ x: 700, y: GROUND_Y - 120, w: 20, h: 120, type: 'glass' }, { x: 880, y: GROUND_Y - 120, w: 20, h: 120, type: 'glass' }, { x: 680, y: GROUND_Y - 144, w: 240, h: 24, type: 'glass' }, { x: 740, y: GROUND_Y - 230, w: 20, h: 86, type: 'stone' }, { x: 840, y: GROUND_Y - 230, w: 20, h: 86, type: 'stone' }, { x: 720, y: GROUND_Y - 254, w: 160, h: 24, type: 'wood' }] },
+    { name: 'Затмение', biome: 'night', birds: ['black', 'yellow', 'black', 'red'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26 }, { x: 720, y: GROUND_Y - 120, r: 22 }, { x: 880, y: GROUND_Y - 120, r: 22 }], blocks: [{ x: 700, y: GROUND_Y - 100, w: 24, h: 100, type: 'stone' }, { x: 880, y: GROUND_Y - 100, w: 24, h: 100, type: 'stone' }, { x: 680, y: GROUND_Y - 124, w: 244, h: 24, type: 'wood' }, { x: 760, y: GROUND_Y - 220, w: 24, h: 96, type: 'wood' }, { x: 816, y: GROUND_Y - 220, w: 24, h: 96, type: 'wood' }, { x: 740, y: GROUND_Y - 244, w: 120, h: 24, type: 'stone' }] },
 
-    // Зима
-    { name: 'Бронированный', biome: 'ice', birds: ['yellow', 'white', 'blue', 'black'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26, type: 'helmet' }, { x: 800, y: GROUND_Y - 150, r: 24, type: 'helmet' }, { x: 800, y: GROUND_Y - 280, r: 22, type: 'helmet' }], blocks: [{ x: 700, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 900, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 690, y: GROUND_Y - 122, w: 220, h: 22, type: 'stone' }, { x: 730, y: GROUND_Y - 200, w: 18, h: 78, type: 'stone' }, { x: 870, y: GROUND_Y - 200, w: 18, h: 78, type: 'stone' }, { x: 720, y: GROUND_Y - 218, w: 180, h: 18, type: 'stone' }, { x: 760, y: GROUND_Y - 300, w: 18, h: 82, type: 'stone' }, { x: 840, y: GROUND_Y - 300, w: 18, h: 82, type: 'stone' }, { x: 750, y: GROUND_Y - 318, w: 120, h: 18, type: 'stone' }] },
-    { name: 'Северное сияние', biome: 'ice', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 820, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 890, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 140, r: 24, type: 'normal' }, { x: 820, y: GROUND_Y - 140, r: 22, type: 'normal' }, { x: 890, y: GROUND_Y - 140, r: 22, type: 'normal' }], blocks: [{ x: 700, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 930, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 690, y: GROUND_Y - 145, w: 276, h: 25, type: 'stone' }, { x: 730, y: GROUND_Y - 220, w: 22, h: 75, type: 'wood' }, { x: 870, y: GROUND_Y - 220, w: 22, h: 75, type: 'wood' }, { x: 720, y: GROUND_Y - 240, w: 185, h: 20, type: 'stone' }, { x: 790, y: GROUND_Y - 300, w: 60, h: 60, type: 'wood' }] },
-    { name: 'Снежная крепость', biome: 'ice', birds: ['black', 'yellow', 'white', 'blue', 'black', 'red'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 800, y: GROUND_Y - 26, r: 26, type: 'normal' }, { x: 900, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 130, r: 22, type: 'normal' }, { x: 850, y: GROUND_Y - 130, r: 22, type: 'normal' }, { x: 800, y: GROUND_Y - 230, r: 26, type: 'normal' }, { x: 700, y: GROUND_Y - 230, r: 20, type: 'normal' }, { x: 900, y: GROUND_Y - 230, r: 20, type: 'normal' }], blocks: [{ x: 660, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 760, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 860, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 650, y: GROUND_Y - 132, w: 256, h: 22, type: 'stone' }, { x: 690, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 790, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 890, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 680, y: GROUND_Y - 232, w: 245, h: 22, type: 'wood' }, { x: 720, y: GROUND_Y - 310, w: 20, h: 78, type: 'wood' }, { x: 870, y: GROUND_Y - 310, w: 20, h: 78, type: 'wood' }, { x: 710, y: GROUND_Y - 330, w: 190, h: 20, type: 'stone' }, { x: 780, y: GROUND_Y - 400, w: 60, h: 70, type: 'stone' }] },
-    { name: 'Ледяной ад', biome: 'ice', birds: ['black', 'black', 'black', 'white', 'yellow', 'blue'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 800, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 900, y: GROUND_Y - 26, r: 24, type: 'normal' }, { x: 750, y: GROUND_Y - 140, r: 22, type: 'normal' }, { x: 850, y: GROUND_Y - 140, r: 22, type: 'normal' }, { x: 800, y: GROUND_Y - 250, r: 24, type: 'normal' }, { x: 800, y: GROUND_Y - 360, r: 22, type: 'normal' }], blocks: [{ x: 660, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 760, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 860, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 650, y: GROUND_Y - 145, w: 250, h: 25, type: 'stone' }, { x: 700, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 830, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 690, y: GROUND_Y - 250, w: 160, h: 20, type: 'stone' }, { x: 730, y: GROUND_Y - 330, w: 20, h: 80, type: 'wood' }, { x: 810, y: GROUND_Y - 330, w: 20, h: 80, type: 'wood' }, { x: 720, y: GROUND_Y - 350, w: 110, h: 20, type: 'stone' }] },
+    // Зима (8)
+    { name: 'Бронированный', biome: 'ice', birds: ['yellow', 'white', 'blue', 'black'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 26, type: 'helmet' }, { x: 800, y: GROUND_Y - 150, r: 24, type: 'helmet' }, { x: 800, y: GROUND_Y - 280, r: 22, type: 'helmet' }], blocks: [{ x: 700, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 900, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 690, y: GROUND_Y - 122, w: 220, h: 22, type: 'stone' }, { x: 730, y: GROUND_Y - 200, w: 18, h: 78, type: 'stone' }, { x: 870, y: GROUND_Y - 200, w: 18, h: 78, type: 'stone' }, { x: 720, y: GROUND_Y - 218, w: 180, h: 18, type: 'stone' }] },
+    { name: 'Северное сияние', biome: 'ice', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 26 }, { x: 820, y: GROUND_Y - 26, r: 24 }, { x: 890, y: GROUND_Y - 26, r: 24 }, { x: 750, y: GROUND_Y - 140, r: 24 }, { x: 820, y: GROUND_Y - 140, r: 22 }, { x: 890, y: GROUND_Y - 140, r: 22 }], blocks: [{ x: 700, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 930, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 690, y: GROUND_Y - 145, w: 276, h: 25, type: 'stone' }, { x: 730, y: GROUND_Y - 220, w: 22, h: 75, type: 'wood' }, { x: 870, y: GROUND_Y - 220, w: 22, h: 75, type: 'wood' }, { x: 720, y: GROUND_Y - 240, w: 185, h: 20, type: 'stone' }] },
+    { name: 'Снежная крепость', biome: 'ice', birds: ['black', 'yellow', 'white', 'blue', 'black', 'red'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24 }, { x: 800, y: GROUND_Y - 26, r: 26 }, { x: 900, y: GROUND_Y - 26, r: 24 }, { x: 750, y: GROUND_Y - 130, r: 22 }, { x: 850, y: GROUND_Y - 130, r: 22 }, { x: 800, y: GROUND_Y - 230, r: 26 }, { x: 700, y: GROUND_Y - 230, r: 20 }, { x: 900, y: GROUND_Y - 230, r: 20 }], blocks: [{ x: 660, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 760, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 860, y: GROUND_Y - 110, w: 24, h: 110, type: 'stone' }, { x: 650, y: GROUND_Y - 132, w: 256, h: 22, type: 'stone' }, { x: 690, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 790, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 890, y: GROUND_Y - 210, w: 22, h: 78, type: 'wood' }, { x: 680, y: GROUND_Y - 232, w: 245, h: 22, type: 'wood' }] },
+    { name: 'Ледяной ад', biome: 'ice', birds: ['black', 'black', 'black', 'white', 'yellow', 'blue'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24 }, { x: 800, y: GROUND_Y - 26, r: 24 }, { x: 900, y: GROUND_Y - 26, r: 24 }, { x: 750, y: GROUND_Y - 140, r: 22 }, { x: 850, y: GROUND_Y - 140, r: 22 }, { x: 800, y: GROUND_Y - 250, r: 24 }, { x: 800, y: GROUND_Y - 360, r: 22 }], blocks: [{ x: 660, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 760, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 860, y: GROUND_Y - 120, w: 26, h: 120, type: 'stone' }, { x: 650, y: GROUND_Y - 145, w: 250, h: 25, type: 'stone' }, { x: 700, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 830, y: GROUND_Y - 230, w: 22, h: 85, type: 'wood' }, { x: 690, y: GROUND_Y - 250, w: 160, h: 20, type: 'stone' }] },
     { name: 'Башня', biome: 'ice', birds: ['yellow', 'blue', 'black', 'red'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 24, type: 'helmet' }, { x: 800, y: GROUND_Y - 150, r: 22, type: 'helmet' }, { x: 800, y: GROUND_Y - 270, r: 22, type: 'helmet' }], blocks: [{ x: 770, y: GROUND_Y - 100, w: 60, h: 20, type: 'stone' }, { x: 770, y: GROUND_Y - 200, w: 60, h: 20, type: 'wood' }, { x: 770, y: GROUND_Y - 320, w: 60, h: 20, type: 'stone' }] },
-    { name: 'Холодная крепость', biome: 'ice', birds: ['black', 'yellow', 'white', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 26, type: 'helmet' }, { x: 850, y: GROUND_Y - 26, r: 26, type: 'helmet' }], blocks: [{ x: 700, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 780, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 860, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 690, y: GROUND_Y - 120, w: 200, h: 20, type: 'glass' }, { x: 720, y: GROUND_Y - 200, w: 20, h: 80, type: 'stone' }, { x: 840, y: GROUND_Y - 200, w: 20, h: 80, type: 'stone' }, { x: 710, y: GROUND_Y - 220, w: 150, h: 20, type: 'stone' }] }
+    { name: 'Холодная крепость', biome: 'ice', birds: ['black', 'yellow', 'white', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 26, type: 'helmet' }, { x: 850, y: GROUND_Y - 26, r: 26, type: 'helmet' }], blocks: [{ x: 700, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 780, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 860, y: GROUND_Y - 100, w: 20, h: 100, type: 'stone' }, { x: 690, y: GROUND_Y - 120, w: 200, h: 20, type: 'glass' }, { x: 720, y: GROUND_Y - 200, w: 20, h: 80, type: 'stone' }, { x: 840, y: GROUND_Y - 200, w: 20, h: 80, type: 'stone' }] },
+    { name: 'Снежный шторм', biome: 'ice', birds: ['white', 'blue', 'yellow', 'black', 'red'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 24 }, { x: 700, y: GROUND_Y - 140, r: 22 }, { x: 900, y: GROUND_Y - 140, r: 22 }], blocks: [{ x: 680, y: GROUND_Y - 100, w: 24, h: 100, type: 'glass' }, { x: 900, y: GROUND_Y - 100, w: 24, h: 100, type: 'glass' }, { x: 660, y: GROUND_Y - 124, w: 284, h: 24, type: 'glass' }, { x: 760, y: GROUND_Y - 220, w: 20, h: 96, type: 'wood' }, { x: 820, y: GROUND_Y - 220, w: 20, h: 96, type: 'wood' }, { x: 740, y: GROUND_Y - 244, w: 120, h: 24, type: 'stone' }] },
+    { name: 'Ледяной трон', biome: 'ice', birds: ['black', 'black', 'black', 'white', 'yellow', 'red'], pigs: [{ x: 800, y: GROUND_Y - 45, r: 45, type: 'boss' }], blocks: [{ x: 700, y: GROUND_Y - 200, w: 24, h: 200, type: 'stone' }, { x: 900, y: GROUND_Y - 200, w: 24, h: 200, type: 'stone' }, { x: 680, y: GROUND_Y - 224, w: 264, h: 24, type: 'stone' }, { x: 770, y: GROUND_Y - 300, w: 24, h: 76, type: 'glass' }, { x: 806, y: GROUND_Y - 300, w: 24, h: 76, type: 'glass' }, { x: 750, y: GROUND_Y - 324, w: 100, h: 24, type: 'wood' }] },
+
+    // Болото (8)
+    { name: 'Топи', biome: 'swamp', birds: ['red', 'red', 'yellow'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 24 }, { x: 880, y: GROUND_Y - 26, r: 24 }], blocks: [{ x: 700, y: GROUND_Y - 120, w: 24, h: 120, type: 'wood' }, { x: 840, y: GROUND_Y - 120, w: 24, h: 120, type: 'wood' }, { x: 680, y: GROUND_Y - 144, w: 204, h: 24, type: 'wood' }], puddles: [{ x: 450, y: GROUND_Y, w: 180, h: 26 }] },
+    { name: 'Засада', biome: 'swamp', birds: ['black', 'yellow', 'red', 'blue'], pigs: [{ x: 700, y: GROUND_Y - 26, r: 24 }, { x: 820, y: GROUND_Y - 26, r: 24 }, { x: 940, y: GROUND_Y - 26, r: 24 }], blocks: [{ x: 660, y: GROUND_Y - 100, w: 22, h: 100, type: 'stone' }, { x: 780, y: GROUND_Y - 100, w: 22, h: 100, type: 'stone' }, { x: 900, y: GROUND_Y - 100, w: 22, h: 100, type: 'stone' }, { x: 640, y: GROUND_Y - 124, w: 304, h: 24, type: 'stone' }], puddles: [{ x: 350, y: GROUND_Y, w: 140, h: 24 }, { x: 520, y: GROUND_Y, w: 100, h: 20 }] },
+    { name: 'Топкое место', biome: 'swamp', birds: ['blue', 'blue', 'black', 'white'], pigs: [{ x: 800, y: GROUND_Y - 26, r: 22 }, { x: 920, y: GROUND_Y - 26, r: 22 }, { x: 860, y: GROUND_Y - 150, r: 22 }], blocks: [{ x: 750, y: GROUND_Y - 120, w: 24, h: 120, type: 'wood' }, { x: 880, y: GROUND_Y - 120, w: 24, h: 120, type: 'wood' }, { x: 730, y: GROUND_Y - 144, w: 194, h: 24, type: 'wood' }, { x: 800, y: GROUND_Y - 240, w: 20, h: 96, type: 'glass' }, { x: 850, y: GROUND_Y - 240, w: 20, h: 96, type: 'glass' }], puddles: [{ x: 280, y: GROUND_Y, w: 160, h: 24 }, { x: 480, y: GROUND_Y, w: 120, h: 20 }, { x: 640, y: GROUND_Y, w: 80, h: 18 }] },
+    { name: 'Гнилые доски', biome: 'swamp', birds: ['red', 'black', 'yellow', 'white', 'blue'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 24 }, { x: 870, y: GROUND_Y - 26, r: 24 }, { x: 810, y: GROUND_Y - 160, r: 22 }, { x: 950, y: GROUND_Y - 26, r: 22 }], blocks: [{ x: 700, y: GROUND_Y - 130, w: 24, h: 130, type: 'wood' }, { x: 820, y: GROUND_Y - 130, w: 24, h: 130, type: 'wood' }, { x: 920, y: GROUND_Y - 130, w: 24, h: 130, type: 'wood' }, { x: 680, y: GROUND_Y - 154, w: 284, h: 24, type: 'wood' }, { x: 760, y: GROUND_Y - 250, w: 22, h: 96, type: 'wood' }, { x: 880, y: GROUND_Y - 250, w: 22, h: 96, type: 'wood' }, { x: 740, y: GROUND_Y - 274, w: 180, h: 24, type: 'stone' }], puddles: [{ x: 420, y: GROUND_Y, w: 180, h: 26 }, { x: 610, y: GROUND_Y, w: 60, h: 20 }] },
+    { name: 'Трясина', biome: 'swamp', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red'], pigs: [{ x: 780, y: GROUND_Y - 26, r: 26 }, { x: 900, y: GROUND_Y - 26, r: 26 }, { x: 840, y: GROUND_Y - 180, r: 24 }, { x: 840, y: GROUND_Y - 300, r: 22 }], blocks: [{ x: 720, y: GROUND_Y - 140, w: 26, h: 140, type: 'stone' }, { x: 820, y: GROUND_Y - 140, w: 26, h: 140, type: 'stone' }, { x: 920, y: GROUND_Y - 140, w: 26, h: 140, type: 'stone' }, { x: 700, y: GROUND_Y - 166, w: 266, h: 26, type: 'stone' }, { x: 760, y: GROUND_Y - 260, w: 24, h: 94, type: 'wood' }, { x: 880, y: GROUND_Y - 260, w: 24, h: 94, type: 'wood' }, { x: 740, y: GROUND_Y - 284, w: 180, h: 24, type: 'stone' }], puddles: [{ x: 250, y: GROUND_Y, w: 150, h: 26 }, { x: 450, y: GROUND_Y, w: 130, h: 22 }, { x: 630, y: GROUND_Y, w: 70, h: 18 }] },
+    { name: 'Ведьмин дом', biome: 'swamp', birds: ['black', 'white', 'yellow', 'blue', 'black'], pigs: [{ x: 800, y: GROUND_Y - 36, r: 32, type: 'helmet' }, { x: 700, y: GROUND_Y - 26, r: 22 }, { x: 900, y: GROUND_Y - 26, r: 22 }, { x: 800, y: GROUND_Y - 180, r: 22 }], blocks: [{ x: 720, y: GROUND_Y - 150, w: 160, h: 24, type: 'stone' }, { x: 740, y: GROUND_Y - 150, w: 24, h: 86, type: 'glass' }, { x: 840, y: GROUND_Y - 150, w: 24, h: 86, type: 'glass' }, { x: 780, y: GROUND_Y - 260, w: 24, h: 96, type: 'wood' }, { x: 800, y: GROUND_Y - 260, w: 24, h: 96, type: 'wood' }], puddles: [{ x: 320, y: GROUND_Y, w: 140, h: 22 }, { x: 500, y: GROUND_Y, w: 100, h: 18 }] },
+    { name: 'Тёмная топь', biome: 'swamp', birds: ['black', 'black', 'black', 'white', 'yellow', 'blue'], pigs: [{ x: 780, y: GROUND_Y - 26, r: 24 }, { x: 880, y: GROUND_Y - 26, r: 24 }, { x: 780, y: GROUND_Y - 170, r: 24 }, { x: 880, y: GROUND_Y - 170, r: 24 }, { x: 830, y: GROUND_Y - 290, r: 22 }], blocks: [{ x: 700, y: GROUND_Y - 140, w: 24, h: 140, type: 'stone' }, { x: 800, y: GROUND_Y - 140, w: 24, h: 140, type: 'stone' }, { x: 900, y: GROUND_Y - 140, w: 24, h: 140, type: 'stone' }, { x: 680, y: GROUND_Y - 164, w: 244, h: 24, type: 'stone' }, { x: 730, y: GROUND_Y - 260, w: 24, h: 96, type: 'wood' }, { x: 880, y: GROUND_Y - 260, w: 24, h: 96, type: 'wood' }, { x: 710, y: GROUND_Y - 284, w: 194, h: 24, type: 'stone' }], puddles: [{ x: 240, y: GROUND_Y, w: 130, h: 24 }, { x: 420, y: GROUND_Y, w: 120, h: 22 }, { x: 580, y: GROUND_Y, w: 100, h: 20 }] },
+    { name: 'Последнее болото', biome: 'swamp', birds: ['black', 'black', 'yellow', 'white', 'blue', 'red', 'black'], pigs: [{ x: 860, y: GROUND_Y - 40, r: 40, type: 'boss' }, { x: 720, y: GROUND_Y - 26, r: 22 }, { x: 960, y: GROUND_Y - 26, r: 22 }, { x: 840, y: GROUND_Y - 180, r: 24 }], blocks: [{ x: 700, y: GROUND_Y - 200, w: 24, h: 200, type: 'stone' }, { x: 860, y: GROUND_Y - 120, w: 100, h: 120, type: 'glass' }], puddles: [{ x: 280, y: GROUND_Y, w: 160, h: 26 }, { x: 480, y: GROUND_Y, w: 140, h: 26 }, { x: 640, y: GROUND_Y, w: 90, h: 22 }] }
 ];
+
+function ensureAudio() { if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} } }
+function beep(f, d, t='sine', v=0.15, s=null) {
+    if (!settings.sound || !audioCtx) return;
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime); if (s) o.frequency.exponentialRampToValueAtTime(s, audioCtx.currentTime + d);
+    g.gain.setValueAtTime(v, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + d);
+    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + d);
+}
+const SFX = {
+    launch:()=>beep(420,0.18,'sawtooth',0.18,780),
+    hit:()=>beep(180,0.09,'square',0.2,90),
+    pop:()=>{ beep(700,0.09,'sine',0.2,1200); setTimeout(()=>beep(1200,0.1,'sine',0.15,500),60); },
+    wood:()=>beep(240,0.1,'triangle',0.18,120),
+    win:()=>{ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,0.22,'triangle',0.16), i*120)); },
+    lose:()=>{ [400,320,240].forEach((f,i)=>setTimeout(()=>beep(f,0.28,'sine',0.16), i*160)); },
+    pull:()=>beep(300,0.05,'sine',0.08,500),
+    ability:()=>beep(600,0.15,'sawtooth',0.2,1400),
+    split:()=>{ [500,700,900].forEach((f,i)=>setTimeout(()=>beep(f,0.1,'triangle',0.14),i*40)); },
+    explosion:()=>{ beep(80,0.5,'sawtooth',0.35,30); beep(200,0.3,'square',0.2,50); },
+    dash:()=>beep(900,0.2,'sawtooth',0.2,1800),
+    star:()=>{ [800,1000,1200].forEach((f,i)=>setTimeout(()=>beep(f,0.15,'triangle',0.15),i*100)); },
+    splash:()=>{ beep(300,0.3,'sine',0.2,80); beep(500,0.15,'triangle',0.15,200); }
+};
+
+function playMusicNote(freq, duration, vol=0.05, type='square') {
+    if (!audioCtx || !settings.music) return;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + duration);
+}
+function startMusic() {
+    if (musicTimer) return; ensureAudio(); if (!audioCtx) return;
+    const melody = [440, 493.88, 523.25, 587.33, 659.25, 587.33, 523.25, 493.88];
+    const bass = [110, 110, 130.81, 130.81, 146.83, 146.83, 164.81, 164.81];
+    let step = 0;
+    musicTimer = setInterval(() => {
+        if (!settings.music) return;
+        playMusicNote(melody[step % melody.length], 0.2, 0.04, 'square');
+        if (step % 2 === 0) playMusicNote(bass[Math.floor(step / 2) % bass.length], 0.4, 0.08, 'triangle');
+        if (step % 2 === 0) playMusicNote(100, 0.1, 0.1, 'sawtooth');
+        step++;
+    }, 250);
+}
+function stopMusic() { if (musicTimer) { clearInterval(musicTimer); musicTimer = null; } }
 
 class Bird {
     constructor(x, y, typeKey = 'red') {
         this.x = x; this.y = y; this.vx = 0; this.vy = 0; this.typeKey = typeKey; this.type = BIRD_TYPES[typeKey]; this.r = this.type.r;
         this.angle = 0; this.angularVel = 0; this.launched = false; this.resting = false; this.trail = []; this.eyeBlink = 0; this.wingFlap = 0;
         this.hitCooldown = 0; this.abilityUsed = false; this.abilityActive = 0; this.isChild = false; this.pulse = 0; this.stuckTimer = 0;
+        this.inWater = false; this.sinkTimer = 0; this.drowned = false;
     }
     launch(vx, vy) {
+        this.x = slingshot.x; this.y = slingshot.y;
         this.vx = vx; this.vy = vy; this.launched = true; this.resting = false; this.angularVel = 0.18;
         SFX.launch(); spawnFeathers(this.x, this.y, 6, this.type.color1); state.shake = 6;
         if (!this.isChild) { saveData.stats.birds++; state.birdsUsed++; saveGame(); }
     }
     activateAbility() {
-        if (this.abilityUsed || !this.launched || this.resting) return false; 
+        if (this.abilityUsed || !this.launched || this.resting || this.drowned) return false;
         const ab = this.type.ability; if (!ab) return false;
         this.abilityUsed = true; SFX.ability(); state.shake = 5; saveData.stats.abilities++; state.abilitiesUsed++; saveGame();
         if (ab === 'dash') {
-            const sp = Math.hypot(this.vx, this.vy)||1; this.vx = (this.vx/sp)*22; this.vy = (this.vy/sp)*22; this.abilityActive = 30; SFX.dash();
+            const sp = Math.hypot(this.vx, this.vy)||1; this.vx = (this.vx/sp)*24; this.vy = (this.vy/sp)*24; this.abilityActive = 30; SFX.dash();
             for(let i=0;i<15;i++) particles.push(new Particle(this.x-this.vx*i*0.3, this.y-this.vy*i*0.3, '#ffe066', {vx:rand(-1,1),vy:rand(-1,1),size:rand(4,8),gravity:0,decay:0.04}));
         } else if (ab === 'split') {
             for (let i = 0; i < 2; i++) {
-                const nb = new Bird(this.x, this.y, 'blue'); 
+                const nb = new Bird(this.x, this.y, 'blue');
                 nb.isChild = true; nb.abilityUsed = true; nb.r = 12; nb.launched = true;
                 const ang = Math.atan2(this.vy, this.vx) + (i===0?-0.35:0.35), spd = Math.hypot(this.vx,this.vy)*0.95;
                 nb.vx = Math.cos(ang)*spd; nb.vy = Math.sin(ang)*spd; nb.angularVel = 0.2; birds.push(nb);
             } SFX.split(); spawnBurst(this.x, this.y, '#74c0fc', 12);
-        } else if (ab === 'bomb') { 
-            this.explode(); 
+        } else if (ab === 'bomb') {
+            this.explode();
             if (pigs.every(p => p.dead)) { state.phase = 'over'; setTimeout(showVictory, 500); }
-        } else if (ab === 'drop') { 
-            eggs.push(new Egg(this.x, this.y + this.r, this)); this.vy -= 3; SFX.ability(); spawnBurst(this.x, this.y + this.r, '#fff', 8); 
+        } else if (ab === 'drop') {
+            eggs.push(new Egg(this.x, this.y + this.r, this)); this.vy -= 3; SFX.ability(); spawnBurst(this.x, this.y + this.r, '#fff', 8);
         }
         return true;
     }
     explode() {
-        SFX.explosion(); state.shake = 25; const R = 130;
+        SFX.explosion(); state.shake = 25; const R = 140;
         for (let i = 0; i < 40; i++) { const a = rand(0, Math.PI*2), s = rand(3, 14); particles.push(new Particle(this.x, this.y, ['#ff6b35','#ffd93d','#ff3b30'][randInt(0,2)], {vx:Math.cos(a)*s, vy:Math.sin(a)*s-2, size:rand(4,12), gravity:0.15, decay:rand(0.015,0.03)})); }
-        pigs.forEach(p => { if (p.dead) return; const d = dist(this.x, this.y, p.x, p.y); if (d < R) { p.damage(999, Math.atan2(p.y-this.y,p.x-this.x)); p.vx += Math.cos(Math.atan2(p.y-this.y,p.x-this.x))*15; p.vy += Math.sin(Math.atan2(p.y-this.y,p.x-this.x))*15-3; p.resting=false; } });
-        blocks.forEach(b => { if (b.hp <= 0) return; const bx = b.x+b.w/2, by = b.y+b.h/2, d = dist(this.x, this.y, bx, by); if (d < R) { b.damage(clamp(250*(1-d/R),30,250)); b.vx += Math.cos(Math.atan2(by-this.y,bx-this.x))*12; b.vy += Math.sin(Math.atan2(by-this.y,bx-this.x))*12-3; b.resting=false; } });
+        pigs.forEach(p => { if (p.dead) return; const d = dist(this.x, this.y, p.x, p.y); if (d < R) { p.damage(999, Math.atan2(p.y-this.y,p.x-this.x)); const a = Math.atan2(p.y-this.y,p.x-this.x); p.vx += Math.cos(a)*15; p.vy += Math.sin(a)*15-3; p.resting=false; } });
+        blocks.forEach(b => { if (b.hp <= 0) return; const bx = b.x+b.w/2, by = b.y+b.h/2, d = dist(this.x, this.y, bx, by); if (d < R) { b.damage(clamp(250*(1-d/R),30,250)); const a = Math.atan2(by-this.y,bx-this.x); b.vx += Math.cos(a)*12; b.vy += Math.sin(a)*12-3; b.resting=false; } });
         this.resting = true; this.vx = 0; this.vy = 0;
     }
     update() {
+        if (this.drowned) {
+            this.sinkTimer++;
+            this.y += 1.2;
+            this.angle += 0.05;
+            this.vx *= 0.95; this.vy *= 0.95;
+            if (this.sinkTimer % 10 === 0) particles.push(new Particle(this.x, this.y - this.r, 'rgba(200,230,255,0.6)', {vx:rand(-1,1),vy:rand(-2,-1),size:rand(2,4),gravity:-0.05,decay:0.02}));
+            if (this.sinkTimer > 90) this.resting = true;
+            return;
+        }
         if (this.launched) {
-            this.vy += GRAVITY; this.vx *= AIR; this.vy *= AIR; this.x += this.vx; this.y += this.vy;
+            let inPuddle = false;
+            for (const p of puddles) {
+                if (this.x > p.x && this.x < p.x + p.w && this.y + this.r * 0.3 > p.y) { inPuddle = true; break; }
+            }
+            if (inPuddle && !this.drowned && !this.resting) {
+                if (!this.inWater) {
+                    this.inWater = true; SFX.splash(); state.shake = 6;
+                    spawnBurst(this.x, this.y, 'rgba(80,140,60,0.9)', 20);
+                    spawnBurst(this.x, this.y, 'rgba(200,230,255,0.8)', 15);
+                    saveData.stats.drowned = (saveData.stats.drowned||0) + 1; saveGame(); checkAchievements();
+                }
+                this.vy += GRAVITY * 0.35 * 0.2;
+                this.vx *= 0.86; this.vy *= 0.86;
+                this.x += this.vx; this.y += this.vy;
+                this.vy = Math.max(this.vy, 1.2);
+                const currentPuddle = puddles.find(p => this.x > p.x && this.x < p.x + p.w);
+                if (currentPuddle && this.y > currentPuddle.y + 55) { this.drowned = true; }
+                return;
+            }
+            stepFlight(this);
             this.angularVel = lerp(this.angularVel, this.vx * 0.012, 0.15); this.angle += this.angularVel;
             if (Math.hypot(this.vx, this.vy) > 2 && settings.highGraphics) { this.trail.push({x:this.x, y:this.y, a:1, r:this.r}); if (this.trail.length > 24) this.trail.shift(); }
             this.trail.forEach(p => p.a *= 0.94);
+
             if (this.y + this.r >= GROUND_Y) {
-                this.y = GROUND_Y - this.r; if (Math.abs(this.vy) > 1.5) { SFX.hit(); state.shake = Math.min(10, Math.abs(this.vy)); spawnDust(this.x, GROUND_Y, 10); }
+                this.y = GROUND_Y - this.r;
+                if (Math.abs(this.vy) > 1.5) { SFX.hit(); state.shake = Math.min(10, Math.abs(this.vy)); spawnDust(this.x, GROUND_Y, 10); }
                 this.vy *= -0.42; this.vx *= 0.72; this.angularVel *= 0.6;
                 if (Math.abs(this.vy) < 1.2 && Math.abs(this.vx) < 1.2) { this.vy = 0; this.vx = 0; this.resting = true; }
             }
             if (this.x + this.r > W) { this.x = W - this.r; this.vx *= -0.5; }
             if (this.x - this.r < 0) { this.x = this.r; this.vx *= -0.5; }
             
-            // КРИТИЧЕСКИЙ ФИКС СОФТЛОКА
-            if (Math.abs(this.vx) < 0.15 && Math.abs(this.vy) < 0.15) { 
-                this.stuckTimer++; 
-                if (this.stuckTimer > 60) this.resting = true; 
-            } else { 
-                this.stuckTimer = 0; 
-            }
-            if (Math.abs(this.vx) < 0.15 && this.y + this.r >= GROUND_Y - 1 && Math.abs(this.vy) < 0.5) this.resting = true;
+            // Если птица упёрлась в землю и не двигается уже 30 кадров (0.5 сек) — она отдыхает.
+            if (Math.abs(this.vx) < 0.2 && this.y + this.r >= GROUND_Y - 2) { this.stuckTimer++; }
+            else { this.stuckTimer = 0; }
+            if (this.stuckTimer > 30) { this.resting = true; this.vx = 0; this.vy = 0; }
+            
         } else { this.wingFlap += 0.08; }
         if (this.hitCooldown > 0) this.hitCooldown--; if (this.eyeBlink > 0) this.eyeBlink--; else if (Math.random() < 0.008) this.eyeBlink = 8;
         if (this.abilityActive > 0) this.abilityActive--; this.pulse += 0.15;
     }
     draw() {
+        if (this.drowned) return;
         const t = this.type, R = this.r;
         for (let i = 0; i < this.trail.length; i++) { const p = this.trail[i], k = i / this.trail.length; ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (0.3 + k * 0.6), 0, Math.PI * 2); ctx.fillStyle = `rgba(255,220,140,${p.a * 0.25 * k})`; ctx.fill(); }
         if (this.abilityActive > 0) { const p = 1 + Math.sin(this.pulse * 2) * 0.15; const g = ctx.createRadialGradient(this.x, this.y, R, this.x, this.y, R * 2.5 * p); g.addColorStop(0, 'rgba(255,230,102,0.5)'); g.addColorStop(1, 'rgba(255,230,102,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(this.x, this.y, R * 2.5 * p, 0, Math.PI * 2); ctx.fill(); }
-        if (this.launched && !this.resting && !this.abilityUsed && t.ability) { const p = 0.7 + Math.sin(this.pulse * 3) * 0.3; ctx.beginPath(); ctx.arc(this.x, this.y, R * 1.5 * p, 0, Math.PI * 2); ctx.strokeStyle = `rgba(255,255,255,${0.4 * p})`; ctx.lineWidth = 3; ctx.stroke(); }
+        if (this.launched && !this.resting && !this.abilityUsed && t.ability && !this.inWater) { const p = 0.7 + Math.sin(this.pulse * 3) * 0.3; ctx.beginPath(); ctx.arc(this.x, this.y, R * 1.5 * p, 0, Math.PI * 2); ctx.strokeStyle = `rgba(255,255,255,${0.4 * p})`; ctx.lineWidth = 3; ctx.stroke(); }
         ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.angle);
+        if (this.inWater) { ctx.globalAlpha = 0.75; }
         if (settings.highGraphics) { ctx.beginPath(); ctx.ellipse(0, 4, R * 1.05, R * 1.0, 0, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.fill(); }
         if (this.typeKey !== 'yellow') { ctx.beginPath(); ctx.moveTo(-R * 0.7, -R * 0.3); ctx.lineTo(-R * 1.8, -R * 0.7); ctx.lineTo(-R * 1.6, 0); ctx.lineTo(-R * 1.9, R * 0.6); ctx.lineTo(-R * 0.7, R * 0.4); ctx.closePath(); const g = ctx.createLinearGradient(-R*1.8, 0, -R*0.6, 0); g.addColorStop(0, t.color3); g.addColorStop(1, t.color2); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = t.color3; ctx.lineWidth = 1.5; ctx.stroke(); }
         if (this.typeKey === 'yellow') {
@@ -426,7 +464,6 @@ class Bird {
             ctx.beginPath(); ctx.moveTo(tipX, 0); ctx.lineTo(backX, topY); ctx.lineTo(backX, botY); ctx.closePath(); ctx.fillStyle = g; ctx.fill();
             ctx.beginPath(); ctx.arc(backX + R*0.15, topY + R*0.05, R*0.2, 0, Math.PI * 2); ctx.fillStyle = t.color2; ctx.fill();
             ctx.beginPath(); ctx.arc(backX + R*0.15, botY - R*0.05, R*0.2, 0, Math.PI * 2); ctx.fillStyle = t.color2; ctx.fill();
-            ctx.beginPath(); ctx.moveTo(tipX - R*0.7, -R*0.3); ctx.lineTo(backX + R*0.3, -R*0.75); ctx.lineTo(backX + R*0.3, -R*0.35); ctx.closePath(); ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.fill();
             ctx.beginPath(); ctx.moveTo(tipX, 0); ctx.lineTo(backX, topY); ctx.lineTo(backX, botY); ctx.closePath(); ctx.strokeStyle = 'rgba(120,80,0,0.8)'; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke();
             ctx.beginPath(); ctx.moveTo(tipX - R*0.15, R*0.2); ctx.lineTo(backX + R*0.4, R*0.85); ctx.lineTo(backX + R*0.2, R*0.5); ctx.closePath(); ctx.fillStyle = t.belly; ctx.fill();
         } else {
@@ -445,26 +482,22 @@ class Bird {
             const lx = clamp(this.vx * 0.05, -3, 3), ly = clamp(this.vy * 0.03, -3, 3);
             ctx.beginPath(); ctx.arc(-R*0.2 + lx, -R*0.25 + ly, R*0.13, 0, Math.PI * 2); ctx.fillStyle = '#111'; ctx.fill();
             ctx.beginPath(); ctx.arc(R*0.28 + lx, -R*0.25 + ly, R*0.13, 0, Math.PI * 2); ctx.fillStyle = '#111'; ctx.fill();
-            ctx.beginPath(); ctx.arc(-R*0.24 + lx, -R*0.3 + ly, R*0.05, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
-            ctx.beginPath(); ctx.arc(R*0.24 + lx, -R*0.3 + ly, R*0.05, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
         }
         ctx.beginPath(); ctx.moveTo(R*0.55, -R*0.05); ctx.lineTo(R*1.55, R*0.15); ctx.lineTo(R*0.55, R*0.42); ctx.closePath();
         const bg = ctx.createLinearGradient(R*0.55, 0, R*1.55, 0); bg.addColorStop(0, '#ffd93d'); bg.addColorStop(1, '#f7a11a');
         ctx.fillStyle = bg; ctx.fill(); ctx.strokeStyle = '#a86a00'; ctx.lineWidth = 1.5; ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(R*0.6, R*0.15); ctx.lineTo(R*1.5, R*0.15); ctx.strokeStyle = 'rgba(140,80,0,0.6)'; ctx.lineWidth = 1; ctx.stroke();
         drawHohol(ctx, R, this.typeKey, t, this.pulse);
         if (this.typeKey === 'black') {
             ctx.beginPath(); ctx.moveTo(0, -R); ctx.quadraticCurveTo(5, -R*1.4, 10, -R*1.5); ctx.strokeStyle = '#8B4513'; ctx.lineWidth = 3; ctx.stroke();
-            const sr = 3 + Math.sin(this.pulse * 3) * 1.5; ctx.beginPath(); ctx.arc(10, -R*1.5, sr, 0, Math.PI * 2); ctx.fillStyle = '#ffcc00'; ctx.shadowColor = '#ff6b35'; ctx.shadowBlur = 15; ctx.fill(); ctx.shadowBlur = 0;
+            const sr = 3 + Math.sin(this.pulse * 3) * 1.5; ctx.beginPath(); ctx.arc(10, -R*1.5, sr, 0, Math.PI * 2); ctx.fillStyle = '#ffcc00'; ctx.fill();
         }
-        if (this.typeKey === 'white') { ctx.beginPath(); ctx.ellipse(-R*0.5, -R*0.8, R*0.25, R*0.15, -0.8, 0, Math.PI * 2); ctx.fillStyle = '#ffffff'; ctx.fill(); ctx.strokeStyle = 'rgba(120,140,160,0.6)'; ctx.lineWidth = 1; ctx.stroke(); }
         ctx.restore();
     }
 }
 function drawHohol(ctx, R, tK, t, p) {
-    if (tK === 'red') { ctx.beginPath(); ctx.moveTo(-R*0.15, -R*0.95); ctx.quadraticCurveTo(-R*0.05, -R*1.6, R*0.35, -R*1.15); ctx.quadraticCurveTo(R*0.1, -R*1.3, R*0.25, -R*0.95); ctx.closePath(); ctx.fillStyle = t.color2; ctx.fill(); ctx.strokeStyle = t.color3; ctx.lineWidth = 1.2; ctx.stroke(); ctx.beginPath(); ctx.moveTo(-R*0.5, -R*0.85); ctx.quadraticCurveTo(-R*0.6, -R*1.3, -R*0.15, -R*1.05); ctx.closePath(); ctx.fill(); ctx.stroke(); }
-    else if (tK === 'yellow') { ctx.beginPath(); ctx.moveTo(-R*0.4, -R*0.95); ctx.quadraticCurveTo(-R*0.55, -R*1.6, -R*0.15, -R*1.3); ctx.quadraticCurveTo(-R*0.25, -R*1.1, 0, -R*1.0); ctx.closePath(); ctx.fillStyle = t.color1; ctx.fill(); ctx.strokeStyle = t.color3; ctx.lineWidth = 1.2; ctx.stroke(); ctx.beginPath(); ctx.moveTo(-R*0.05, -R*1.0); ctx.quadraticCurveTo(R*0.15, -R*1.65, R*0.5, -R*1.15); ctx.quadraticCurveTo(R*0.2, -R*1.2, R*0.3, -R*1.0); ctx.closePath(); ctx.fill(); ctx.stroke(); }
-    else if (tK === 'blue') { ctx.beginPath(); ctx.moveTo(-R*0.2, -R*0.85); ctx.quadraticCurveTo(-R*0.1, -R*1.4, R*0.2, -R*1.0); ctx.closePath(); ctx.fillStyle = t.color1; ctx.fill(); ctx.strokeStyle = t.color3; ctx.lineWidth = 1; ctx.stroke(); }
+    if (tK === 'red') { ctx.beginPath(); ctx.moveTo(-R*0.15, -R*0.95); ctx.quadraticCurveTo(-R*0.05, -R*1.6, R*0.35, -R*1.15); ctx.quadraticCurveTo(R*0.1, -R*1.3, R*0.25, -R*0.95); ctx.closePath(); ctx.fillStyle = t.color2; ctx.fill(); ctx.strokeStyle = t.color3; ctx.lineWidth = 1.2; ctx.stroke(); }
+    else if (tK === 'yellow') { ctx.beginPath(); ctx.moveTo(-R*0.4, -R*0.95); ctx.quadraticCurveTo(-R*0.55, -R*1.6, -R*0.15, -R*1.3); ctx.quadraticCurveTo(-R*0.25, -R*1.1, 0, -R*1.0); ctx.closePath(); ctx.fillStyle = t.color1; ctx.fill(); ctx.strokeStyle = t.color3; ctx.lineWidth = 1.2; ctx.stroke(); }
+    else if (tK === 'blue') { ctx.beginPath(); ctx.moveTo(-R*0.2, -R*0.85); ctx.quadraticCurveTo(-R*0.1, -R*1.4, R*0.2, -R*1.0); ctx.closePath(); ctx.fillStyle = t.color1; ctx.fill(); }
     else if (tK === 'white') { ctx.beginPath(); ctx.moveTo(-R*0.15, -R*0.95); ctx.quadraticCurveTo(-R*0.3, -R*1.55, R*0.15, -R*1.2); ctx.quadraticCurveTo(R*0.0, -R*1.1, R*0.15, -R*0.95); ctx.closePath(); ctx.fillStyle = '#ffffff'; ctx.fill(); ctx.strokeStyle = '#90a4ae'; ctx.lineWidth = 1.2; ctx.stroke(); }
 }
 
@@ -485,31 +518,62 @@ class Egg {
 
 class Pig {
     constructor(x, y, r = 26, type = 'normal') { this.x=x; this.y=y; this.r=r; this.type=type; this.vx=0; this.vy=0; this.hp = type==='boss' ? 3 : 1; this.dead=false; this.resting=true; this.hurtFlash=0; this.blink=0; this.squish=0; this.breathing=Math.random()*Math.PI*2; }
-    damage(amount, angle) { 
-        if (this.dead) return; 
+    damage(amount, angle) {
+        if (this.dead) return;
         if (this.type === 'helmet' && angle !== undefined) {
             const deg = (angle * 180 / Math.PI) % 360;
             if (deg > 45 && deg < 135) { SFX.wood(); spawnBurst(this.x, this.y - this.r, '#ccc', 8); return; }
         }
         this.hp -= amount; this.hurtFlash = 12; this.squish = 1;
-        if (this.hp <= 0) { 
-            this.dead = true; 
+        if (this.hp <= 0) {
+            this.dead = true;
             const pts = this.type==='boss' ? 10000 : (this.type==='helmet' ? 2000 : 5000);
-            state.score += pts; addScore(pts, this.x, this.y); 
-            SFX.pop(); spawnBurst(this.x, this.y, '#90ee90', 22); spawnFeathers(this.x, this.y, 6, '#90ee90'); state.shake = 8; saveData.stats.pigs++; saveGame(); 
-        } else { SFX.wood(); } 
+            state.score += pts; addScore(pts, this.x, this.y);
+            SFX.pop(); spawnBurst(this.x, this.y, '#90ee90', 22); spawnFeathers(this.x, this.y, 6, '#90ee90'); state.shake = 8; saveData.stats.pigs++; saveGame();
+        } else { SFX.wood(); }
     }
-    update() { if (this.hurtFlash > 0) this.hurtFlash--; if (this.squish > 0) this.squish *= 0.85; if (this.blink > 0) this.blink--; else if (Math.random() < 0.01) this.blink = 10; this.breathing += 0.05;
-        if (!this.resting && !this.dead) { this.vy += GRAVITY; this.vx *= AIR; this.x += this.vx; this.y += this.vy;
-            if (this.y + this.r >= GROUND_Y) { this.y = GROUND_Y - this.r; if (Math.abs(this.vy) > 4) this.damage(Math.abs(this.vy) * 3); this.vy *= -0.35; this.vx *= 0.7;
-                if (Math.abs(this.vy) < 1.2 && Math.abs(this.vx) < 0.7) { this.vy = 0; this.vx = 0; this.resting = true; } }
-            if (this.x - this.r < 0) { this.x = this.r; this.vx *= -0.5; } if (this.x + this.r > W) { this.x = W - this.r; this.vx *= -0.5; } } }
+    inPuddle() {
+        for (const p of puddles) if (this.x > p.x && this.x < p.x + p.w && this.y + this.r * 0.5 > p.y) return true;
+        return false;
+    }
+    update() {
+        if (this.hurtFlash > 0) this.hurtFlash--; if (this.squish > 0) this.squish *= 0.85;
+        if (this.blink > 0) this.blink--; else if (Math.random() < 0.01) this.blink = 10;
+        this.breathing += 0.05;
+        if (!this.resting && !this.dead) {
+            const inWater = this.inPuddle();
+            const sub = 1 / PHYS_SUBSTEPS;
+            for (let i = 0; i < PHYS_SUBSTEPS; i++) {
+                if (inWater) {
+                    this.vy *= 0.88;
+                    this.vy -= 0.05;
+                    this.vx *= 0.90;
+                } else {
+                    this.vy += GRAVITY * sub;
+                }
+                this.vx *= Math.pow(0.9995, sub * 60);
+                this.vy *= Math.pow(0.9995, sub * 60);
+                this.x += this.vx * sub;
+                this.y += this.vy * sub;
+            }
+            const groundThis = inWater ? GROUND_Y - 4 : GROUND_Y;
+            if (this.y + this.r >= groundThis) {
+                this.y = groundThis - this.r;
+                if (!inWater && Math.abs(this.vy) > 4) this.damage(Math.abs(this.vy) * 3);
+                this.vy *= inWater ? -0.1 : -0.35;
+                this.vx *= inWater ? 0.85 : 0.7;
+                if (Math.abs(this.vy) < 1.2 && Math.abs(this.vx) < (inWater ? 1.2 : 0.7)) { this.vy = 0; this.vx = 0; this.resting = true; }
+            }
+            if (this.x - this.r < 0) { this.x = this.r; this.vx *= -0.5; }
+            if (this.x + this.r > W) { this.x = W - this.r; this.vx *= -0.5; }
+        }
+    }
     draw() { if (this.dead) return; const R = this.r, br = Math.sin(this.breathing) * 0.03, sx = 1 + this.squish * 0.25 + br, sy = 1 - this.squish * 0.25 - br;
         ctx.save(); ctx.translate(this.x, this.y); ctx.scale(sx, sy);
         if (settings.highGraphics) { ctx.beginPath(); ctx.ellipse(0, R * 0.95, R * 0.9, R * 0.25, 0, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fill(); }
-        const bg = ctx.createRadialGradient(-R*0.35, -R*0.4, R*0.1, 0, 0, R*1.15); 
-        if (this.type === 'boss') { bg.addColorStop(0, '#ffb347'); bg.addColorStop(0.5, '#ff8c00'); bg.addColorStop(1, '#b35c00'); }
-        else if (this.hurtFlash > 0) { bg.addColorStop(0, '#ffb3b3'); bg.addColorStop(0.5, '#ff6b6b'); bg.addColorStop(1, '#b03030'); } 
+        const bg = ctx.createRadialGradient(-R*0.35, -R*0.4, R*0.1, 0, 0, R*1.15);
+        if (this.type === 'boss') { bg.addColorStop(0, '#8bc34a'); bg.addColorStop(0.5, '#4caf50'); bg.addColorStop(1, '#2e7d32'); }
+        else if (this.hurtFlash > 0) { bg.addColorStop(0, '#ffb3b3'); bg.addColorStop(0.5, '#ff6b6b'); bg.addColorStop(1, '#b03030'); }
         else { bg.addColorStop(0, '#c5f7ae'); bg.addColorStop(0.5, '#79d65c'); bg.addColorStop(1, '#3f8a2a'); }
         ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.fillStyle = bg; ctx.fill();
         if (settings.highGraphics) { ctx.beginPath(); ctx.ellipse(-R*0.35, -R*0.45, R*0.35, R*0.22, -0.5, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fill(); }
@@ -519,11 +583,10 @@ class Pig {
         const eo = this.blink > 0 ? 0.1 : 1;
         ctx.beginPath(); ctx.ellipse(-R*0.3, -R*0.2, R*0.22, R*0.26 * eo, 0, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); ctx.strokeStyle = '#2d4d1e'; ctx.lineWidth = 1.5; ctx.stroke();
         ctx.beginPath(); ctx.ellipse(R*0.3, -R*0.2, R*0.22, R*0.26 * eo, 0, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); ctx.stroke();
-        if (this.blink <= 0) { ctx.beginPath(); ctx.arc(-R*0.28, -R*0.18, R*0.1, 0, Math.PI * 2); ctx.fillStyle = '#111'; ctx.fill(); ctx.beginPath(); ctx.arc(R*0.28, -R*0.18, R*0.1, 0, Math.PI * 2); ctx.fillStyle = '#111'; ctx.fill();
-            ctx.beginPath(); ctx.arc(-R*0.31, -R*0.22, R*0.04, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); ctx.beginPath(); ctx.arc(R*0.25, -R*0.22, R*0.04, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); }
+        if (this.blink <= 0) { ctx.beginPath(); ctx.arc(-R*0.28, -R*0.18, R*0.1, 0, Math.PI * 2); ctx.fillStyle = '#111'; ctx.fill(); ctx.beginPath(); ctx.arc(R*0.28, -R*0.18, R*0.1, 0, Math.PI * 2); ctx.fillStyle = '#111'; ctx.fill(); }
         ctx.beginPath(); ctx.ellipse(0, R*0.28, R*0.42, R*0.32, 0, 0, Math.PI * 2); const sg = ctx.createRadialGradient(-R*0.1, R*0.2, 2, 0, R*0.28, R*0.5); sg.addColorStop(0, '#b8f0a0'); sg.addColorStop(1, '#5cae42');
         ctx.fillStyle = sg; ctx.fill(); ctx.strokeStyle = '#2d4d1e'; ctx.lineWidth = 1.5; ctx.stroke();
-        ctx.beginPath(); ctx.ellipse(-R*0.13, R*0.28, R*0.06, R*0.09, 0, 0, Math.PI * 2); ctx.fillStyle = '#2d4d1e'; ctx.fill(); ctx.beginPath(); ctx.ellipse(R*0.13, R*0.28, R*0.06, R*0.09, 0, 0, Math.PI * 2); ctx.fillStyle = '#2d4d1e'; ctx.fill(); 
+        ctx.beginPath(); ctx.ellipse(-R*0.13, R*0.28, R*0.06, R*0.09, 0, 0, Math.PI * 2); ctx.fillStyle = '#2d4d1e'; ctx.fill(); ctx.beginPath(); ctx.ellipse(R*0.13, R*0.28, R*0.06, R*0.09, 0, 0, Math.PI * 2); ctx.fillStyle = '#2d4d1e'; ctx.fill();
         if (this.type === 'helmet') {
             ctx.beginPath(); ctx.arc(0, -R*0.3, R*0.95, Math.PI, 0); ctx.lineTo(R*1.0, -R*0.3); ctx.lineTo(-R*1.0, -R*0.3); ctx.closePath();
             const hg = ctx.createLinearGradient(0, -R*1.2, 0, -R*0.3); hg.addColorStop(0, '#a0a0a0'); hg.addColorStop(1, '#505050');
@@ -540,30 +603,45 @@ class Pig {
 }
 
 class Block {
-    constructor(x, y, w, h, type = 'wood') { 
-        this.x=x; this.y=y; this.w=w; this.h=h; this.type=type; this.vx=0; this.vy=0; this.resting=true; 
-        if(type==='stone') this.hp = 200;
-        else if(type==='glass') this.hp = 30;
-        else this.hp = 100;
-        this.maxHp=this.hp; this.flash=0; this.rot=0; this.rotVel=0; this.texSeed = (x*7+y*13+w*3)%100; 
+    constructor(x, y, w, h, type = 'wood') {
+        this.x=x; this.y=y; this.w=w; this.h=h; this.type=type; this.vx=0; this.vy=0; this.resting=true;
+        if(type==='stone') this.hp = 220;
+        else if(type==='glass') this.hp = 35;
+        else this.hp = 110;
+        this.maxHp=this.hp; this.flash=0; this.rot=0; this.rotVel=0; this.texSeed = (x*7+y*13+w*3)%100;
     }
     damage(amount) { this.hp -= amount; this.flash = 10;
-        if (this.hp <= 0) { 
-            SFX.wood(); 
+        if (this.hp <= 0) {
+            SFX.wood();
             const col = this.type==='stone'?'#9aa5b1':(this.type==='glass'?'#e0f7fa':'#c8965c');
-            spawnBurst(this.x+this.w/2, this.y+this.h/2, col, 14); 
-            state.score += this.type==='glass' ? 200 : 500; addScore(this.type==='glass' ? 200 : 500, this.x+this.w/2, this.y+this.h/2); 
-            saveData.stats.blocks++; saveGame(); 
-        } 
+            spawnBurst(this.x+this.w/2, this.y+this.h/2, col, 14);
+            state.score += this.type==='glass' ? 200 : 500; addScore(this.type==='glass' ? 200 : 500, this.x+this.w/2, this.y+this.h/2);
+            saveData.stats.blocks++; saveGame();
+        } else { this.resting = false; }
     }
-    update() { 
+    update() {
         if (this.flash > 0) this.flash--; if (this.hp <= 0) return;
-        if (!this.resting) { this.vy += GRAVITY; this.vx *= AIR; this.x += this.vx; this.y += this.vy; this.rot += this.rotVel;
-            if (this.y + this.h >= GROUND_Y) { this.y = GROUND_Y - this.h; this.vy *= -0.3; this.vx *= 0.7; this.rotVel *= 0.5;
-                if (Math.abs(this.vy) < 1 && Math.abs(this.vx) < 0.5) { this.vy = 0; this.vx = 0; this.resting = true; this.rotVel = 0; } }
-            if (this.x < 0) { this.x = 0; this.vx *= -0.5; } if (this.x + this.w > W) { this.x = W - this.w; this.vx *= -0.5; } } 
+        if (this.resting) return;
+        const sub = 1 / PHYS_SUBSTEPS;
+        for (let i = 0; i < PHYS_SUBSTEPS; i++) {
+            this.vy += GRAVITY * sub;
+            this.vx *= Math.pow(0.9994, sub * 60);
+            this.vy *= Math.pow(0.9994, sub * 60);
+            this.x += this.vx * sub;
+            this.y += this.vy * sub;
+            this.rot += this.rotVel * sub;
+        }
+        if (this.y + this.h >= GROUND_Y) {
+            this.y = GROUND_Y - this.h;
+            this.vy *= -0.28; this.vx *= 0.72; this.rotVel *= 0.6;
+            if (Math.abs(this.vy) < 0.8 && Math.abs(this.vx) < 0.4) {
+                this.vy = 0; this.vx = 0; this.resting = true; this.rotVel = 0;
+            }
+        }
+        if (this.x < 0) { this.x = 0; this.vx *= -0.5; }
+        if (this.x + this.w > W) { this.x = W - this.w; this.vx *= -0.5; }
     }
-    draw() { 
+    draw() {
         if (this.hp <= 0) return;
         ctx.save(); ctx.translate(this.x + this.w/2, this.y + this.h/2); ctx.rotate(this.rot); const x = -this.w/2, y = -this.h/2;
         if (settings.highGraphics) { ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 4; }
@@ -572,18 +650,6 @@ class Block {
         else if (this.type === 'glass') { grad = ctx.createLinearGradient(x, y, x+this.w, y+this.h); if (this.flash > 0) { grad.addColorStop(0, '#fff'); grad.addColorStop(1, '#aaa'); } else { grad.addColorStop(0, 'rgba(200,240,255,0.7)'); grad.addColorStop(0.5, 'rgba(150,210,240,0.6)'); grad.addColorStop(1, 'rgba(100,180,220,0.7)'); } }
         else { grad = ctx.createLinearGradient(x, y, x, y+this.h); if (this.flash > 0) { grad.addColorStop(0, '#ffb3b3'); grad.addColorStop(1, '#cc6666'); } else { grad.addColorStop(0, '#e0b078'); grad.addColorStop(0.4, '#c8965c'); grad.addColorStop(1, '#8a5c2c'); } }
         ctx.fillStyle = grad; ctx.fillRect(x, y, this.w, this.h); ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
-        
-        if (this.type === 'wood') { 
-            ctx.strokeStyle = 'rgba(80,40,10,0.35)'; ctx.lineWidth = 1; const iV = this.h > this.w, c = Math.max(2, Math.floor(iV ? this.w/8 : this.h/8));
-            for (let i = 1; i < c; i++) { ctx.beginPath(); if (iV) { const px = x + i*(this.w/c); ctx.moveTo(px, y); ctx.lineTo(px, y+this.h); } else { const py = y + i*(this.h/c); ctx.moveTo(x, py); ctx.lineTo(x+this.w, py); } ctx.stroke(); } 
-        } else if (this.type === 'glass') {
-            ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 2;
-            ctx.beginPath(); ctx.moveTo(x+2, y+2); ctx.lineTo(x+this.w/2, y+this.h/2); ctx.lineTo(x+2, y+this.h-2); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(x+this.w-2, y+2); ctx.lineTo(x+this.w/2, y+this.h/2); ctx.lineTo(x+this.w-2, y+this.h-2); ctx.stroke();
-        } else { 
-            ctx.strokeStyle = 'rgba(40,50,60,0.4)'; ctx.lineWidth = 1; for (let i = 0; i < 3; i++) { const sx = x + ((this.texSeed+i*37)%100)/100*this.w, sy = y + ((this.texSeed+i*53)%100)/100*this.h; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx+8, sy+10); ctx.lineTo(sx+3, sy+18); ctx.stroke(); } 
-        }
-        
         ctx.strokeStyle = this.type==='stone'?'#2d3742':(this.type==='glass'?'#80deea':'#5a3a1a'); ctx.lineWidth = 2; ctx.strokeRect(x, y, this.w, this.h);
         if (settings.highGraphics) {
             const blik = ctx.createLinearGradient(x, y, x, y+this.h*0.35); blik.addColorStop(0, 'rgba(255,255,255,0.35)'); blik.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = blik; ctx.fillRect(x, y, this.w, this.h*0.35);
@@ -617,11 +683,19 @@ function drawSky() {
     const curB = LEVELS[state.currentLevel] ? LEVELS[state.currentLevel].biome : 'day', b = BIOMES[curB];
     const sg = ctx.createLinearGradient(0, 0, 0, GROUND_Y + 50); sg.addColorStop(0, b.skyTop); sg.addColorStop(0.5, b.skyMid); sg.addColorStop(1, b.skyBot);
     ctx.fillStyle = sg; ctx.fillRect(0, 0, W, GROUND_Y + 50);
+    if (b.foggy) {
+        for (let i = 0; i < 8; i++) {
+            const fx = ((state.time * 0.4 + i * 200) % (W + 300)) - 150;
+            const fy = 100 + (i % 3) * 70;
+            ctx.fillStyle = 'rgba(160,180,140,0.18)';
+            ctx.beginPath(); ctx.ellipse(fx, fy, 220, 70, 0, 0, Math.PI * 2); ctx.fill();
+        }
+    }
     stars.forEach(s => { s.twinkle += s.speed; const a = 0.4 + Math.sin(s.twinkle) * 0.4; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fillStyle = `rgba(255,255,255,${a})`; ctx.fill(); });
     if (curB === 'night' || curB === 'sunset') { ctx.save(); ctx.shadowColor = 'rgba(255,240,200,0.9)'; ctx.shadowBlur = 40; ctx.beginPath(); ctx.arc(830, 100, 42, 0, Math.PI * 2); const mg = ctx.createRadialGradient(820, 90, 5, 830, 100, 45); mg.addColorStop(0, '#fffbe8'); mg.addColorStop(0.7, '#ffeeb5'); mg.addColorStop(1, '#f5d98a'); ctx.fillStyle = mg; ctx.fill(); ctx.restore(); }
     ctx.fillStyle = b.mountain; ctx.beginPath(); ctx.moveTo(0, GROUND_Y - 20); for (let x = 0; x <= W; x += 50) { const h = 60 + Math.sin(x * 0.008) * 30 + Math.sin(x * 0.021) * 20; ctx.lineTo(x, GROUND_Y - 30 - h); } ctx.lineTo(W, GROUND_Y); ctx.lineTo(0, GROUND_Y); ctx.closePath(); ctx.fill();
     ctx.fillStyle = 'rgba(40,30,80,0.75)'; ctx.beginPath(); ctx.moveTo(0, GROUND_Y); for (let x = 0; x <= W; x += 40) { const h = 30 + Math.sin(x * 0.012 + 1) * 20 + Math.cos(x * 0.03) * 15; ctx.lineTo(x, GROUND_Y - h); } ctx.lineTo(W, GROUND_Y); ctx.closePath(); ctx.fill();
-    clouds.forEach(c => { c.x += c.speed; if (c.x > W + 120 * c.scale) c.x = -120 * c.scale; ctx.save(); ctx.globalAlpha = c.alpha; ctx.fillStyle = 'rgba(255, 245, 235, 0.85)'; ctx.beginPath(); ctx.arc(c.x, c.y, 28*c.scale, 0, Math.PI*2); ctx.arc(c.x+30*c.scale, c.y-8*c.scale, 34*c.scale, 0, Math.PI*2); ctx.arc(c.x+65*c.scale, c.y, 26*c.scale, 0, Math.PI*2); ctx.arc(c.x+35*c.scale, c.y+12*c.scale, 30*c.scale, 0, Math.PI*2); ctx.arc(c.x+5*c.scale, c.y+10*c.scale, 22*c.scale, 0, Math.PI*2); ctx.fill(); ctx.restore(); });
+    clouds.forEach(c => { c.x += c.speed; if (c.x > W + 120 * c.scale) c.x = -120 * c.scale; ctx.save(); ctx.globalAlpha = c.alpha * (b.foggy ? 0.5 : 1); ctx.fillStyle = b.foggy ? 'rgba(150,170,130,0.85)' : 'rgba(255, 245, 235, 0.85)'; ctx.beginPath(); ctx.arc(c.x, c.y, 28*c.scale, 0, Math.PI*2); ctx.arc(c.x+30*c.scale, c.y-8*c.scale, 34*c.scale, 0, Math.PI*2); ctx.arc(c.x+65*c.scale, c.y, 26*c.scale, 0, Math.PI*2); ctx.arc(c.x+35*c.scale, c.y+12*c.scale, 30*c.scale, 0, Math.PI*2); ctx.arc(c.x+5*c.scale, c.y+10*c.scale, 22*c.scale, 0, Math.PI*2); ctx.fill(); ctx.restore(); });
 }
 
 function drawGround() {
@@ -629,6 +703,47 @@ function drawGround() {
     const grad = ctx.createLinearGradient(0, GROUND_Y, 0, H); grad.addColorStop(0, b.ground1); grad.addColorStop(1, b.ground2); ctx.fillStyle = grad; ctx.fillRect(0, GROUND_Y, W, H - GROUND_Y);
     ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; ctx.fillRect(0, GROUND_Y, W, 4); ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; ctx.lineWidth = 2;
     for (let i = 0; i < W; i += 12) { const h = 6 + Math.sin(i * 0.3 + state.time * 0.02) * 3; ctx.beginPath(); ctx.moveTo(i, GROUND_Y + 2); ctx.quadraticCurveTo(i + 3, GROUND_Y - h, i + 7, GROUND_Y + 2); ctx.stroke(); }
+
+    puddles.forEach(p => {
+        ctx.save();
+        const fogGrad = ctx.createLinearGradient(p.x, p.y - 40, p.x, p.y);
+        fogGrad.addColorStop(0, 'rgba(140, 200, 100, 0)');
+        fogGrad.addColorStop(1, 'rgba(100, 180, 80, 0.3)');
+        ctx.fillStyle = fogGrad;
+        ctx.beginPath(); ctx.ellipse(p.x + p.w/2, p.y, p.w/2 + 20, 40 + Math.sin(state.time*0.03)*10, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+
+        const wave1 = Math.sin(state.time * 0.05) * 2;
+        const wave2 = Math.cos(state.time * 0.06) * 2;
+        const g = ctx.createLinearGradient(0, p.y - 6, 0, p.y + p.h);
+        g.addColorStop(0, 'rgba(60,110,50,0.9)');
+        g.addColorStop(1, 'rgba(20,40,15,0.95)');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y + 4);
+        ctx.quadraticCurveTo(p.x + p.w / 2, p.y + 2 + wave1, p.x + p.w, p.y + 4);
+        ctx.lineTo(p.x + p.w, p.y + p.h);
+        ctx.quadraticCurveTo(p.x + p.w / 2, p.y + p.h + 2 - wave2, p.x, p.y + p.h);
+        ctx.closePath(); ctx.fill();
+
+        for (let i = 0; i < 3; i++) {
+            const lx = p.x + 20 + ((i * 73 + state.time * 0.1) % (p.w - 40));
+            const ly = p.y + 6 + (i % 2) * 6;
+            ctx.beginPath();
+            ctx.fillStyle = '#4caf50';
+            ctx.arc(lx, ly, 6, 0.2, Math.PI * 2 - 0.2);
+            ctx.lineTo(lx, ly);
+            ctx.fill();
+            ctx.fillStyle = '#81c784';
+            ctx.beginPath(); ctx.arc(lx - 1, ly - 1, 1.5, 0, Math.PI*2); ctx.fill();
+        }
+
+        for (let i = 0; i < 4; i++) {
+            const bx = p.x + 15 + ((i * 47 + state.time * 0.4) % (p.w - 30));
+            const by = p.y + 8 + Math.sin(state.time * 0.1 + i) * 3;
+            ctx.beginPath(); ctx.arc(bx, by, 2.5, 0, Math.PI * 2); ctx.fillStyle = 'rgba(200,230,160,0.7)'; ctx.fill();
+        }
+    });
 }
 
 function drawSlingshotBack() {
@@ -637,7 +752,6 @@ function drawSlingshotBack() {
     grad.addColorStop(0, '#7a4a1e'); grad.addColorStop(1, '#4a2c10');
     ctx.strokeStyle = grad; ctx.lineWidth = 14;
     ctx.beginPath(); ctx.moveTo(slingshot.x + 30, GROUND_Y); ctx.quadraticCurveTo(slingshot.x + 32, GROUND_Y - 60, slingshot.forkRight.x, slingshot.forkRight.y); ctx.stroke();
-    if (settings.highGraphics) { ctx.strokeStyle = 'rgba(30,15,5,0.6)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(slingshot.x + 30, GROUND_Y); ctx.quadraticCurveTo(slingshot.x + 32, GROUND_Y - 60, slingshot.forkRight.x, slingshot.forkRight.y); ctx.stroke(); }
     ctx.restore();
 }
 
@@ -647,7 +761,7 @@ function drawSlingshotFront() {
     grad.addColorStop(0, '#9c5f26'); grad.addColorStop(1, '#5c3814');
     ctx.strokeStyle = grad; ctx.lineWidth = 16;
     ctx.beginPath(); ctx.moveTo(slingshot.x - 30, GROUND_Y); ctx.quadraticCurveTo(slingshot.x - 32, GROUND_Y - 60, slingshot.forkLeft.x, slingshot.forkLeft.y); ctx.stroke();
-    
+
     const anchorL = slingshot.forkLeft, anchorR = slingshot.forkRight;
     let birdX = bird ? bird.x : slingshot.x, birdY = bird ? bird.y : slingshot.y;
 
@@ -671,31 +785,50 @@ function drawTrajectory() {
     const dx = slingshot.x - bird.x, dy = slingshot.y - bird.y;
     const power = Math.min(Math.hypot(dx, dy), MAX_PULL);
     const angle = Math.atan2(dy, dx);
-    let vx = Math.cos(angle) * power * LAUNCH_MULT, vy = Math.sin(angle) * power * LAUNCH_MULT;
+    const vx0 = Math.cos(angle) * power * LAUNCH_MULT;
+    const vy0 = Math.sin(angle) * power * LAUNCH_MULT;
 
-    let sx = slingshot.x, sy = slingshot.y;
-    ctx.save(); ctx.setLineDash([6, 12]); ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(sx, sy);
-    for (let i = 0; i < 80; i++) {
-        vy += GRAVITY; sx += vx; sy += vy;
-        if (settings.perfectPhysics) { vx *= AIR; vy *= AIR; }
-        if (sy > GROUND_Y || sx > W || sx < 0) break;
-        ctx.lineTo(sx, sy);
-    }
-    ctx.stroke(); ctx.restore();
-
-    sx = slingshot.x; sy = slingshot.y; vx = Math.cos(angle) * power * LAUNCH_MULT; vy = Math.sin(angle) * power * LAUNCH_MULT;
-    for (let i = 0; i < 80; i++) {
-        vy += GRAVITY; sx += vx; sy += vy;
-        if (settings.perfectPhysics) { vx *= AIR; vy *= AIR; }
-        if (sy > GROUND_Y || sx > W || sx < 0) break;
-        if (i % 5 === 0) {
-            const t = i / 80, alpha = 0.9 * (1 - t * 0.7), r = 3.5 * (1 - t * 0.4);
-            ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2); ctx.fillStyle = `rgba(255, 220, 100, ${alpha})`;
-            ctx.shadowColor = 'rgba(255,180,50,0.9)'; ctx.shadowBlur = 8; ctx.fill();
+    const sim = { x: slingshot.x, y: slingshot.y, vx: vx0, vy: vy0, r: bird.r };
+    const pts = [];
+    let waterHit = null;
+    for (let i = 0; i < 200; i++) {
+        let inPuddle = false;
+        for (const p of puddles) {
+            if (sim.x > p.x && sim.x < p.x + p.w && sim.y + sim.r * 0.3 > p.y) { inPuddle = true; break; }
         }
+        if (inPuddle) { waterHit = { x: sim.x, y: sim.y }; break; }
+        stepFlight(sim);
+        if (sim.y > GROUND_Y || sim.x > W || sim.x < 0) break;
+        pts.push({ x: sim.x, y: sim.y });
+    }
+
+    ctx.save();
+    ctx.setLineDash([6, 12]);
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(slingshot.x, slingshot.y);
+    for (const p of pts) ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    ctx.restore();
+
+    for (let i = 0; i < pts.length; i += 5) {
+        const t = i / pts.length;
+        const alpha = 0.9 * (1 - t * 0.7);
+        const r = 3.5 * (1 - t * 0.4);
+        ctx.beginPath(); ctx.arc(pts[i].x, pts[i].y, r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 220, 100, ${alpha})`;
+        ctx.shadowColor = 'rgba(255,180,50,0.9)'; ctx.shadowBlur = 8; ctx.fill();
     }
     ctx.shadowBlur = 0;
+
+    if (waterHit) {
+        ctx.beginPath(); ctx.arc(waterHit.x, waterHit.y, 12, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(80,200,90,0.6)'; ctx.fill();
+        ctx.strokeStyle = 'rgba(255,80,80,0.9)'; ctx.lineWidth = 3; ctx.stroke();
+        ctx.fillStyle = 'white'; ctx.font = 'bold 14px "Segoe UI"'; ctx.textAlign = 'center';
+        ctx.fillText('🌊', waterHit.x, waterHit.y - 18);
+    }
 
     const pct = power / MAX_PULL, barW = 220, barH = 16, bx = slingshot.x - barW / 2, by = GROUND_Y + 30;
     ctx.fillStyle = 'rgba(0,0,0,0.5)'; roundRect(bx - 3, by - 3, barW + 6, barH + 6, 10); ctx.fill();
@@ -730,12 +863,12 @@ function updatePhysics() {
     if (state.shake > 0) { state.shake *= 0.85; state.shakeX = rand(-state.shake, state.shake); state.shakeY = rand(-state.shake, state.shake); if (state.shake < 0.3) state.shake = 0; }
 
     birds.forEach(b => {
-        if (!b.launched || b.resting) return;
+        if (!b.launched || b.resting || b.drowned) return;
         const speed = Math.hypot(b.vx, b.vy);
         pigs.forEach(pig => {
             if (pig.dead || b.hitCooldown > 0) return;
             if (circleCircle(b, pig)) {
-                pig.damage(999, Math.atan2(b.y-pig.y, b.x-pig.x)); 
+                pig.damage(999, Math.atan2(b.y-pig.y, b.x-pig.x));
                 pig.vx = b.vx * 0.6; pig.vy = b.vy * 0.5 - 2; pig.resting = false;
                 const dx = b.x - pig.x, dy = b.y - pig.y, d = Math.hypot(dx, dy) || 1;
                 b.vx = (dx / d) * speed * 0.55; b.vy = (dy / d) * speed * 0.55 - 1; b.hitCooldown = 6;
@@ -747,7 +880,7 @@ function updatePhysics() {
             if (circleRect(b, block)) {
                 if (speed > 4) block.damage(clamp(speed * 7, 15, 130));
                 resolveCircleRect(b, block); block.vx += b.vx * 0.25; block.vy += b.vy * 0.2;
-                if (Math.abs(block.vx) > 1 || Math.abs(block.vy) > 1) block.resting = false;
+                block.resting = false;
                 b.hitCooldown = 4; state.shake = Math.min(10, speed * 0.7); if (speed > 3) SFX.hit();
             }
         });
@@ -775,19 +908,27 @@ function updatePhysics() {
     }
 
     if (state.phase === 'flying') {
-        const anyFlying = birds.some(b => b.launched && !b.resting && b.y < H + 100);
-        if (!anyFlying && state.time - state.launchTime > 30) endShot();
+        // Если птица улетела за экран или застряла более чем на 4 секунды (240 кадров) — завершаем ход
+        const anyFlying = birds.some(b => b.launched && !b.resting && !b.drowned && b.y < H + 100);
+        if (!anyFlying || state.time - state.launchTime > 240) endShot();
     }
 }
 
-let currentBirdQueue = [];
-let currentLevelIdx = 0;
+function isLevelUnlocked(idx) {
+    if (settings.unlockAll) return true;
+    return idx === 0 || saveData.levels[idx - 1] !== undefined || saveData.levels[idx] !== undefined;
+}
 
 function loadLevel(idx) {
+    if (idx < 0) idx = 0;
+    if (idx >= LEVELS.length) idx = LEVELS.length - 1;
+    if (!isLevelUnlocked(idx)) return;
+
     const level = LEVELS[idx];
     currentLevelIdx = idx; state.currentLevel = idx; state.score = 0; state.phase = 'idle';
     state.dragging = false; state.shake = 0; state.time = 0; state.launchTime = 0; state.birdsUsed = 0; state.abilitiesUsed = 0;
     birds = []; pigs = []; blocks = []; eggs = []; particles = []; feathers = []; floatingTexts = []; bird = null;
+    puddles = level.puddles ? level.puddles.map(p => ({...p})) : [];
     lastAbilityTime = 0;
 
     currentBirdQueue = [...level.birds]; spawnNextBird();
@@ -806,7 +947,7 @@ function spawnNextBird() {
 }
 
 function updateAbilityIndicator() {
-    const fb = birds.find(b => b.launched && !b.resting && !b.abilityUsed && b.type.ability && b.y < H);
+    const fb = birds.find(b => b.launched && !b.resting && !b.abilityUsed && b.type.ability && b.y < H && !b.inWater && !b.drowned);
     if (fb) { abilityIcon.textContent = fb.type.icon; abilityText.textContent = fb.type.abilityName + ' — Клик!'; abilityIndicator.classList.add('show'); }
     else abilityIndicator.classList.remove('show');
 }
@@ -815,15 +956,16 @@ function updateHUD() { scoreEl.textContent = state.score; }
 
 function endShot() {
     if (state.phase !== 'flying') return;
-    if (birds.some(b => b.launched && !b.resting && b.y < H + 100)) return;
+    // Ждём пока все птицы остановятся или утонут
+    if (birds.some(b => b.launched && !b.resting && !b.drowned && b.y < H + 100)) return;
     state.phase = 'settling';
 
     const alivePigs = pigs.filter(p => !p.dead).length;
     if (alivePigs === 0) { setTimeout(() => { if (state.phase === 'settling') { state.phase = 'over'; showVictory(); } }, 600); return; }
-    
+
     if (currentBirdQueue.length === 0) { setTimeout(() => { if (state.phase === 'settling') { state.phase = 'over'; showDefeat(); } }, 600); return; }
 
-    setTimeout(() => { if (state.phase === 'settling') { birds = birds.filter(b => b.launched && !b.resting); bird = null; spawnNextBird(); } }, 700);
+    setTimeout(() => { if (state.phase === 'settling') { birds = birds.filter(b => b.launched && !b.resting && !b.drowned); bird = null; spawnNextBird(); } }, 700);
 }
 
 function showVictory() {
@@ -835,24 +977,32 @@ function showVictory() {
         SFX.star(); updateHUD();
     }
 
-    const level = LEVELS[currentLevelIdx]; 
+    const level = LEVELS[currentLevelIdx];
     const maxPossible = (level.pigs.length * 5000) + (level.blocks.length * 500) + 10000;
     let stars = 1;
-    if (state.score >= maxPossible * 0.85) stars = 3; 
+    if (state.score >= maxPossible * 0.85) stars = 3;
     else if (state.score >= maxPossible * 0.60) stars = 2;
-    
+
     if (!saveData.levels[currentLevelIdx] || state.score > saveData.levels[currentLevelIdx].score) saveData.levels[currentLevelIdx] = { score: state.score, stars };
     saveGame(); checkAchievements();
 
     overlayTitle.textContent = 'Победа!'; overlayScore.textContent = state.score;
     overlayStars.textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
-    nextLevelBtn.style.display = (currentLevelIdx < LEVELS.length - 1) ? 'flex' : 'none';
+    
+    // Показываем кнопку "Следующий" только если есть следующий уровень
+    if (currentLevelIdx < LEVELS.length - 1) {
+        nextOverlayBtn.style.display = 'block';
+    } else {
+        nextOverlayBtn.style.display = 'none';
+    }
+
     overlay.classList.add('show'); SFX.win(); buildLevelsGrid();
 }
 
 function showDefeat() {
     overlayTitle.textContent = 'Провал...'; overlayScore.textContent = state.score; overlayStars.textContent = '☆☆☆';
-    nextLevelBtn.style.display = 'none'; overlay.classList.add('show'); SFX.lose();
+    nextOverlayBtn.style.display = 'none';
+    overlay.classList.add('show'); SFX.lose();
 }
 
 function hideOverlay() { overlay.classList.remove('show'); }
@@ -871,13 +1021,13 @@ function onDown(e) {
     const m = getMouse(e), now = performance.now();
 
     if (state.phase === 'flying') {
-        const fb = birds.find(b => b.launched && !b.resting && !b.abilityUsed && b.type.ability && b.y < H);
+        const fb = birds.find(b => b.launched && !b.resting && !b.abilityUsed && b.type.ability && b.y < H && !b.inWater && !b.drowned);
         if (fb && now - lastAbilityTime > 300) { lastAbilityTime = now; if (fb.activateAbility()) { updateAbilityIndicator(); return; } }
         return;
     }
 
     if (state.phase !== 'idle' || !bird || bird.launched) return;
-    if (dist(m.x, m.y, bird.x, bird.y) < 70 || dist(m.x, m.y, slingshot.x, slingshot.y) < 70) {
+    if (dist(m.x, m.y, bird.x, bird.y) < 80 || dist(m.x, m.y, slingshot.x, slingshot.y) < 80) {
         state.dragging = true; state.phase = 'aiming'; SFX.pull();
     }
 }
@@ -922,11 +1072,12 @@ soundToggle.addEventListener('click', () => { settings.sound = !settings.sound; 
 physicsToggle.addEventListener('click', () => { settings.perfectPhysics = !settings.perfectPhysics; saveSettings(); });
 graphicsToggle.addEventListener('click', () => { settings.highGraphics = !settings.highGraphics; saveSettings(); });
 fpsToggle.addEventListener('click', () => { settings.showFps = !settings.showFps; saveSettings(); });
+unlockAllBtn.addEventListener('click', () => { settings.unlockAll = !settings.unlockAll; saveSettings(); buildLevelsGrid(); });
 resetSaveBtn.addEventListener('click', () => { if(confirm('Удалить весь прогресс?')) { localStorage.removeItem(SAVE_KEY); loadSave(); alert('Прогресс сброшен!'); } });
 
 restartBtn.addEventListener('click', () => { ensureAudio(); loadLevel(currentLevelIdx); });
 playAgainBtn.addEventListener('click', () => { ensureAudio(); loadLevel(currentLevelIdx); });
-nextLevelBtn.addEventListener('click', () => { ensureAudio(); if (currentLevelIdx < LEVELS.length - 1) loadLevel(currentLevelIdx + 1); });
+nextOverlayBtn.addEventListener('click', () => { ensureAudio(); overlay.classList.remove('show'); loadLevel(currentLevelIdx + 1); });
 menuBtn.addEventListener('click', () => { hideGameUI(); overlay.classList.remove('show'); menuScreen.classList.add('show'); state.phase = 'menu'; stopMusic(); });
 overlayMenuBtn.addEventListener('click', () => { overlay.classList.remove('show'); hideGameUI(); menuScreen.classList.add('show'); state.phase = 'menu'; stopMusic(); });
 
@@ -935,8 +1086,7 @@ function hideGameUI() { hud.style.display = 'none'; controls.style.display = 'no
 
 function buildLevelsGrid() {
     levelsContainer.innerHTML = '';
-    const categories = { day: [], sunset: [], desert: [], night: [], ice: [] };
-    
+    const categories = { day: [], sunset: [], desert: [], night: [], ice: [], swamp: [] };
     LEVELS.forEach((level, idx) => {
         const biome = level.biome || 'day';
         if (categories[biome]) categories[biome].push({ level, idx });
@@ -944,23 +1094,20 @@ function buildLevelsGrid() {
 
     for (const [biomeKey, levelsList] of Object.entries(categories)) {
         if (levelsList.length === 0) continue;
-        
         const header = document.createElement('div');
         header.className = 'category-title';
-        header.innerHTML = `${BIOMES[biomeKey].icon} ${BIOMES[biomeKey].name}`;
+        header.innerHTML = `${BIOMES[biomeKey].icon} ${BIOMES[biomeKey].name} (${levelsList.length})`;
         levelsContainer.appendChild(header);
 
         const grid = document.createElement('div');
         grid.className = 'levels-grid';
 
         levelsList.forEach(({ level, idx }) => {
-            const unlocked = idx === 0 || saveData.levels[idx - 1];
+            const unlocked = isLevelUnlocked(idx);
             const best = saveData.levels[idx];
-            const card = document.createElement('div'); card.className = 'level-card' + (unlocked ? '' : ' locked');
+            const card = document.createElement('div');
+            card.className = 'level-card' + (unlocked ? '' : ' locked') + (idx === currentLevelIdx ? ' current' : '');
             card.innerHTML = `<div class="level-num">#${idx+1}</div><div class="level-name">${level.name}</div>`;
-            const bd = document.createElement('div'); bd.className = 'level-birds';
-            level.birds.forEach(t => { const i = document.createElement('div'); i.className = 'bird-icon ' + t; bd.appendChild(i); });
-            card.appendChild(bd);
             const st = document.createElement('div'); st.className = 'level-stars';
             st.textContent = best ? '⭐'.repeat(best.stars) + '☆'.repeat(3 - best.stars) : '☆☆☆'; card.appendChild(st);
             if (!unlocked) { const l = document.createElement('div'); l.className = 'level-lock'; l.textContent = '🔒'; card.appendChild(l); }
@@ -1002,13 +1149,12 @@ function drawBirdQueue() {
         const typeKey = currentBirdQueue[i], t = BIRD_TYPES[typeKey], x = startX + i * 46;
         ctx.save(); ctx.translate(x, y); ctx.scale(0.7, 0.7);
         const g = ctx.createRadialGradient(-8, -8, 2, 0, 0, 22); g.addColorStop(0, t.color1); g.addColorStop(1, t.color3);
-        if (typeKey === 'yellow') { ctx.beginPath(); ctx.moveTo(22, 0); ctx.lineTo(-18, -20); ctx.lineTo(-18, 20); ctx.closePath(); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = 'rgba(120,80,0,0.8)'; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke(); }
+        if (typeKey === 'yellow') { ctx.beginPath(); ctx.moveTo(22, 0); ctx.lineTo(-18, -20); ctx.lineTo(-18, 20); ctx.closePath(); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = 'rgba(120,80,0,0.8)'; ctx.lineWidth = 2; ctx.stroke(); }
         else { ctx.beginPath(); ctx.arc(0, 0, 20, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = 2; ctx.stroke(); }
         ctx.beginPath(); ctx.arc(-5, -5, 5, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
         ctx.beginPath(); ctx.arc(5, -5, 5, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill();
         ctx.beginPath(); ctx.arc(-5, -5, 2.5, 0, Math.PI * 2); ctx.fillStyle = 'black'; ctx.fill();
         ctx.beginPath(); ctx.arc(5, -5, 2.5, 0, Math.PI * 2); ctx.fillStyle = 'black'; ctx.fill();
-        ctx.beginPath(); ctx.moveTo(-12, -12); ctx.lineTo(2, -16); ctx.strokeStyle = 'rgba(0,0,0,0.85)'; ctx.lineWidth = 3; ctx.stroke();
         ctx.beginPath(); ctx.moveTo(8, 0); ctx.lineTo(22, 4); ctx.lineTo(8, 10); ctx.closePath(); ctx.fillStyle = '#ffd93d'; ctx.fill(); ctx.strokeStyle = '#a86a00'; ctx.lineWidth = 1; ctx.stroke();
         ctx.restore();
         ctx.save(); ctx.font = 'bold 10px "Segoe UI"'; ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = 2; ctx.strokeText(t.name, x, y + 26); ctx.fillText(t.name, x, y + 26); ctx.restore();
@@ -1023,14 +1169,12 @@ let fpsLastTime = performance.now(), frames = 0;
 function gameLoop(t) {
     if (!lastTime) lastTime = t;
     let dt = t - lastTime; lastTime = t; if (dt > 100) dt = 100;
-    
     frames++;
     if (t - fpsLastTime >= 1000) {
         if(settings.showFps) fpsCounter.textContent = 'FPS: ' + frames;
         frames = 0;
         fpsLastTime = t;
     }
-
     accumulator += dt; let steps = 0;
     while (accumulator >= STEP && steps < 5) {
         if (state.phase !== 'menu') updatePhysics(); else { particles.forEach(p => p.update()); particles = particles.filter(p => p.life > 0); state.time++; }
@@ -1043,6 +1187,7 @@ function gameLoop(t) {
 loadSettings();
 initBackground();
 loadSave();
+updateSettingsUI();
 requestAnimationFrame(gameLoop);
 </script>
 </body>
