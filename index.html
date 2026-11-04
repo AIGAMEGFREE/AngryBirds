@@ -74,6 +74,7 @@
     .setting-btn.on { background: #4cd964; color: white; }
     .setting-btn.off { background: #ff3b30; color: white; }
     .setting-btn.neutral { background: rgba(255,255,255,0.2); color: white; }
+    #achievementsGrid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important; }
     @media (max-width: 700px) {
         .hint { display: none; }
         .menu-title { font-size: 52px; }
@@ -87,6 +88,7 @@
         .overlay-title { font-size: 32px; }
         .overlay-stars { font-size: 36px; }
         .hazard-badge { font-size: 9px; }
+        #achievementsGrid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; }
     }
     @media (max-width: 480px) {
         .menu-title { font-size: 38px; }
@@ -155,7 +157,7 @@
     </div>
     <div class="levels-screen" id="achievementsScreen" style="z-index: 115;">
         <div class="levels-header"><div class="levels-title">🏆 Награды</div><button class="btn-back" id="achBackBtn">← Назад</button></div>
-        <div class="levels-grid" id="achievementsGrid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));"></div>
+        <div class="levels-grid" id="achievementsGrid"></div>
     </div>
     <div class="settings-screen" id="settingsScreen">
         <div class="levels-header" style="position: absolute; top: 24px; width: min(1000px, 100%);">
@@ -168,15 +170,18 @@
             <div class="setting-row"><span>⚙️ Идеальная физика</span><button class="setting-btn on" id="physicsToggle">Вкл</button></div>
             <div class="setting-row"><span>✨ Графика</span><button class="setting-btn on" id="graphicsToggle">Высокая</button></div>
             <div class="setting-row"><span>📺 FPS Счётчик</span><button class="setting-btn on" id="fpsToggle">Вкл</button></div>
-            <div class="setting-row"><span>🔓 Все уровни</span><button class="setting-btn off" id="unlockAllBtn">Выкл</button></div>
             <div class="setting-row"><span>👤 Авторы</span><button class="setting-btn neutral" id="authorsBtn">Открыть</button></div>
             <div class="setting-row"><span>💾 Сохранение</span><button class="setting-btn off" id="resetSaveBtn">Сбросить</button></div>
         </div>
     </div>
     <div class="levels-screen" id="creditsScreen" style="z-index: 125; justify-content: center; background: rgba(10,14,39,0.95);">
         <div class="levels-title" style="margin-bottom: 20px;">Создатели</div>
-        <div style="color: white; font-size: 24px; line-height: 2; text-align: center; font-weight: bold;">
+        <div style="color: white; font-size: 24px; line-height: 1.8; text-align: center; font-weight: bold;">
             RedDarkWoid<br>DeepSeek<br>Лекс
+        </div>
+        <div class="levels-title" style="margin-top: 30px; margin-bottom: 10px; font-size: 28px; color: #4dabf7;">Бета-тестеры</div>
+        <div style="color: #ffd93d; font-size: 22px; line-height: 1.8; text-align: center; font-weight: bold;">
+            Mr.R
         </div>
         <button class="btn btn-play" style="margin-top: 40px;" id="creditsBackBtn">Назад</button>
     </div>
@@ -218,13 +223,13 @@ const restartBtn = $('restartBtn'), menuBtn = $('menuBtn');
 const menuScreen = $('menuScreen'), levelsScreen = $('levelsScreen'), levelsContainer = $('levelsContainer'), playBtn = $('playBtn'), levelsBtn = $('levelsBtn'), backBtn = $('backBtn');
 const achievementsBtn = $('achievementsBtn'), achievementsScreen = $('achievementsScreen'), achievementsGrid = $('achievementsGrid'), achBackBtn = $('achBackBtn');
 const settingsBtn = $('settingsBtn'), settingsScreen = $('settingsScreen'), settingsBackBtn = $('settingsBackBtn');
-const musicToggle = $('musicToggle'), soundToggle = $('soundToggle'), physicsToggle = $('physicsToggle'), graphicsToggle = $('graphicsToggle'), fpsToggle = $('fpsToggle'), unlockAllBtn = $('unlockAllBtn'), authorsBtn = $('authorsBtn'), resetSaveBtn = $('resetSaveBtn');
+const musicToggle = $('musicToggle'), soundToggle = $('soundToggle'), physicsToggle = $('physicsToggle'), graphicsToggle = $('graphicsToggle'), fpsToggle = $('fpsToggle'), authorsBtn = $('authorsBtn'), resetSaveBtn = $('resetSaveBtn');
 const creditsScreen = $('creditsScreen'), creditsBackBtn = $('creditsBackBtn');
 const fpsCounter = $('fps-counter');
 
 // ======================== КОНСТАНТЫ ========================
-const SAVE_KEY = 'angryBirds_ultimate_v114';
-const SETTINGS_KEY = 'angryBirds_settings_v114';
+const SAVE_KEY = 'angryBirds_ultimate_v124';
+const SETTINGS_KEY = 'angryBirds_settings_v124';
 const GRAVITY = 0.42;
 const GROUND_Y = H - 78;
 const MAX_PULL = 140;
@@ -232,7 +237,7 @@ const LAUNCH_MULT = 0.30;
 const PHYS_SUBSTEPS = isLowEnd ? 4 : 8;
 
 // ======================== НАСТРОЙКИ ========================
-let settings = { music: true, sound: true, perfectPhysics: true, highGraphics: !isLowEnd, showFps: false, unlockAll: false };
+let settings = { music: true, sound: true, perfectPhysics: true, highGraphics: !isLowEnd, showFps: false };
 let saveData = { levels: {}, achievements: {}, stats: { birds: 0, pigs: 0, blocks: 0, abilities: 0, drowned: 0 } };
 
 function loadSettings() { try { const r = localStorage.getItem(SETTINGS_KEY); if (r) settings = Object.assign(settings, JSON.parse(r)); } catch(e) {} }
@@ -243,7 +248,6 @@ function updateSettingsUI() {
     physicsToggle.textContent = settings.perfectPhysics ? 'Вкл' : 'Выкл'; physicsToggle.className = 'setting-btn ' + (settings.perfectPhysics ? 'on' : 'off');
     graphicsToggle.textContent = settings.highGraphics ? 'Высокая' : 'Низкая'; graphicsToggle.className = 'setting-btn ' + (settings.highGraphics ? 'on' : 'off');
     fpsToggle.textContent = settings.showFps ? 'Вкл' : 'Выкл'; fpsToggle.className = 'setting-btn ' + (settings.showFps ? 'on' : 'off');
-    unlockAllBtn.textContent = settings.unlockAll ? 'Вкл' : 'Выкл'; unlockAllBtn.className = 'setting-btn ' + (settings.unlockAll ? 'on' : 'off');
     fpsCounter.style.display = settings.showFps ? 'block' : 'none';
 }
 function loadSave() { try { const r = localStorage.getItem(SAVE_KEY); if (r) { saveData = JSON.parse(r); if (!saveData.stats) saveData.stats = { birds: 0, pigs: 0, blocks: 0, abilities: 0, drowned: 0 }; if (!saveData.levels) saveData.levels = {}; if (!saveData.achievements) saveData.achievements = {}; } } catch(e) {} }
@@ -328,7 +332,7 @@ const BIOMES = {
     sunset: { name: 'Закат', icon: '🌅', skyTop: '#1a2151', skyMid: '#3d4d8c', skyBot: '#ffd89b', ground1: '#7bc043', ground2: '#3f7a22', mountain: 'rgba(60,50,110,0.55)', hazard: 'Слабый боковой ветер сносит птицу', wind: 0.012, friction: 1, gravityMult: 1 },
     desert: { name: 'Пустыня', icon: '🏜️', skyTop: '#f6d365', skyMid: '#fda085', skyBot: '#ffedbc', ground1: '#f0c27b', ground2: '#9c6b3e', mountain: 'rgba(180,120,80,0.5)', hazard: 'Зыбучий песок: блоки тонут, трение выше', wind: 0, friction: 0.88, gravityMult: 1.1 },
     night: { name: 'Ночь', icon: '🌙', skyTop: '#0f0c29', skyMid: '#302b63', skyBot: '#24243e', ground1: '#2d5a27', ground2: '#1a3a15', mountain: 'rgba(20,15,50,0.8)', hazard: 'Темнота: птица летит быстрее', wind: 0, friction: 1, gravityMult: 0.92 },
-    ice: { name: 'Зима', icon: '❄️', skyTop: '#83a4d4', skyMid: '#b6fbff', skyBot: '#ffffff', ground1: '#e0f7fa', ground2: '#80deea', mountain: 'rgba(150,180,200,0.5)', hazard: 'Гололёд: низкое трение, всё скользит', wind: 0, friction: 0.55, gravityMult: 1 },
+    ice: { name: 'Зима', icon: '❄️', skyTop: '#83a4d4', skyMid: '#b6fbff', skyBot: '#ffffff', ground1: '#e0f7fa', ground2: '#80deea', mountain: 'rgba(150,180,200,0.5)', hazard: 'Гололёд: низкое трение, всё скользит', wind: 0, friction: 0.85, gravityMult: 1 },
     swamp: { name: 'Болото', icon: '🌿', skyTop: '#3a4a2e', skyMid: '#5c6b45', skyBot: '#a8b58a', ground1: '#4a5a32', ground2: '#2a3a1a', mountain: 'rgba(30,45,25,0.7)', hazard: 'Трясина: птица тонет в лужах', wind: 0, friction: 0.92, gravityMult: 1.05, foggy: true },
     volcano: { name: 'Вулкан', icon: '🌋', skyTop: '#2b0a0a', skyMid: '#6b1a0a', skyBot: '#e85d04', ground1: '#4a1a0a', ground2: '#1a0500', mountain: 'rgba(80,20,0,0.85)', hazard: 'Жар: взрывы мощнее, птица теряет скорость', wind: 0, friction: 1.15, gravityMult: 1.08 },
     candy: { name: 'Сладости', icon: '🍭', skyTop: '#ffd6e8', skyMid: '#ffb3d9', skyBot: '#fff0f6', ground1: '#ff9ecd', ground2: '#e91e8c', mountain: 'rgba(255,150,200,0.5)', hazard: 'Липкий сироп: птица замедляется', wind: 0, friction: 1.25, gravityMult: 1 },
@@ -336,11 +340,22 @@ const BIOMES = {
     forest: { name: 'Лес', icon: '🌲', skyTop: '#2d4a2d', skyMid: '#4a7a3a', skyBot: '#8ab58a', ground1: '#4a6a2a', ground2: '#2a3a1a', mountain: 'rgba(30,60,30,0.7)', hazard: 'Лесная чаща: траектория короче видна', wind: 0, friction: 1, gravityMult: 1 }
 };
 
-// ======================== УРОВНИ (45 + уровень Лекса) ========================
+// ======================== УРОВНИ ========================
 const LEVELS = [
     // ☀️ ДЕНЬ
     { name: 'Разминка', biome: 'day', birds: ['red', 'red', 'red'], pigs: [{ x: 720, y: GROUND_Y - 26, r: 26 }, { x: 840, y: GROUND_Y - 26, r: 26 }], blocks: [{ x: 700, y: GROUND_Y - 120, w: 24, h: 120, type: 'wood' }, { x: 816, y: GROUND_Y - 120, w: 24, h: 120, type: 'wood' }, { x: 680, y: GROUND_Y - 144, w: 180, h: 24, type: 'wood' }] },
-    { name: 'Знакомство', biome: 'day', birds: ['red', 'yellow', 'red'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 26 }, { x: 870, y: GROUND_Y - 26, r: 26 }, { x: 810, y: GROUND_Y - 144, r: 24 }], blocks: [{ x: 720, y: GROUND_Y - 120, w: 24, h: 120, type: 'wood' }, { x: 840, y: GROUND_Y - 120, w: 24, h: 120, type: 'wood' }, { x: 700, y: GROUND_Y - 144, w: 184, h: 24, type: 'wood' }, { x: 770, y: GROUND_Y - 240, w: 24, h: 96, type: 'wood' }, { x: 820, y: GROUND_Y - 240, w: 24, h: 96, type: 'wood' }, { x: 750, y: GROUND_Y - 264, w: 114, h: 24, type: 'wood' }] },
+    { name: 'Башня', biome: 'day', birds: ['yellow', 'yellow', 'yellow', 'yellow', 'yellow'], pigs: [
+        { x: 800, y: GROUND_Y - 22, r: 22 }, { x: 800, y: GROUND_Y - 82, r: 22 }, { x: 800, y: GROUND_Y - 142, r: 22 }, 
+        { x: 800, y: GROUND_Y - 202, r: 22 }, { x: 800, y: GROUND_Y - 262, r: 22 }
+    ], blocks: [
+        { x: 760, y: GROUND_Y - 50, w: 80, h: 12, type: 'wood' },
+        { x: 760, y: GROUND_Y - 110, w: 80, h: 12, type: 'wood' },
+        { x: 760, y: GROUND_Y - 170, w: 80, h: 12, type: 'wood' },
+        { x: 760, y: GROUND_Y - 230, w: 80, h: 12, type: 'wood' },
+        { x: 760, y: GROUND_Y - 290, w: 80, h: 12, type: 'wood' },
+        { x: 750, y: GROUND_Y - 290, w: 12, h: 290, type: 'wood' },
+        { x: 838, y: GROUND_Y - 290, w: 12, h: 290, type: 'wood' }
+    ] },
     { name: 'Разделённые', biome: 'day', birds: ['blue', 'blue', 'red'], pigs: [{ x: 710, y: GROUND_Y - 26, r: 24 }, { x: 830, y: GROUND_Y - 26, r: 24 }, { x: 950, y: GROUND_Y - 26, r: 24 }], blocks: [{ x: 680, y: GROUND_Y - 100, w: 22, h: 100, type: 'stone' }, { x: 800, y: GROUND_Y - 100, w: 22, h: 100, type: 'stone' }, { x: 920, y: GROUND_Y - 100, w: 22, h: 100, type: 'stone' }, { x: 660, y: GROUND_Y - 122, w: 304, h: 22, type: 'wood' }] },
     { name: 'Трио', biome: 'day', birds: ['red', 'yellow', 'black'], pigs: [{ x: 740, y: GROUND_Y - 26, r: 24 }, { x: 860, y: GROUND_Y - 26, r: 24 }, { x: 800, y: GROUND_Y - 160, r: 24 }], blocks: [{ x: 720, y: GROUND_Y - 130, w: 24, h: 130, type: 'wood' }, { x: 840, y: GROUND_Y - 130, w: 24, h: 130, type: 'wood' }, { x: 700, y: GROUND_Y - 154, w: 184, h: 24, type: 'stone' }, { x: 770, y: GROUND_Y - 240, w: 20, h: 86, type: 'wood' }, { x: 820, y: GROUND_Y - 240, w: 20, h: 86, type: 'wood' }, { x: 750, y: GROUND_Y - 260, w: 110, h: 20, type: 'wood' }] },
     { name: 'Высотка', biome: 'day', birds: ['red', 'yellow', 'black', 'blue'], pigs: [{ x: 750, y: GROUND_Y - 26, r: 24 }, { x: 850, y: GROUND_Y - 26, r: 24 }, { x: 800, y: GROUND_Y - 250, r: 24 }], blocks: [{ x: 700, y: GROUND_Y - 150, w: 24, h: 150, type: 'stone' }, { x: 840, y: GROUND_Y - 150, w: 24, h: 150, type: 'stone' }, { x: 680, y: GROUND_Y - 174, w: 204, h: 24, type: 'stone' }, { x: 740, y: GROUND_Y - 240, w: 20, h: 66, type: 'wood' }, { x: 850, y: GROUND_Y - 240, w: 20, h: 66, type: 'wood' }, { x: 720, y: GROUND_Y - 260, w: 170, h: 20, type: 'stone' }] },
@@ -357,9 +372,23 @@ const LEVELS = [
     { name: 'Сфинкс', biome: 'desert', birds: ['yellow', 'red', 'black', 'white'], pigs: [{ x: 780, y: GROUND_Y - 22, r: 22, type: 'shield' }, { x: 680, y: GROUND_Y - 22, r: 22, type: 'helmet' }, { x: 880, y: GROUND_Y - 22, r: 22, type: 'helmet' }, { x: 780, y: GROUND_Y - 170, r: 24 }], blocks: [{ x: 650, y: GROUND_Y - 100, w: 22, h: 100, type: 'stone' }, { x: 910, y: GROUND_Y - 100, w: 22, h: 100, type: 'stone' }, { x: 630, y: GROUND_Y - 122, w: 304, h: 22, type: 'stone' }, { x: 720, y: GROUND_Y - 210, w: 20, h: 88, type: 'wood' }, { x: 840, y: GROUND_Y - 210, w: 20, h: 88, type: 'glass' }, { x: 700, y: GROUND_Y - 232, w: 170, h: 22, type: 'stone' }] },
     { name: 'Барханы', biome: 'desert', birds: ['black', 'black', 'blue', 'yellow'], pigs: [{ x: 750, y: GROUND_Y - 24, r: 24, type: 'bomber' }, { x: 870, y: GROUND_Y - 24, r: 24 }, { x: 810, y: GROUND_Y - 150, r: 24 }], blocks: [{ x: 720, y: GROUND_Y - 130, w: 22, h: 130, type: 'stone' }, { x: 850, y: GROUND_Y - 130, w: 22, h: 130, type: 'stone' }, { x: 700, y: GROUND_Y - 152, w: 174, h: 22, type: 'stone' }, { x: 780, y: GROUND_Y - 240, w: 20, h: 88, type: 'wood' }, { x: 830, y: GROUND_Y - 240, w: 20, h: 88, type: 'wood' }, { x: 760, y: GROUND_Y - 262, w: 100, h: 22, type: 'stone' }] },
     { name: 'Фараон', biome: 'desert', birds: ['red', 'yellow', 'black', 'white', 'blue'], pigs: [{ x: 800, y: GROUND_Y - 38, r: 38, type: 'boss' }, { x: 690, y: GROUND_Y - 24, r: 24, type: 'shield' }, { x: 910, y: GROUND_Y - 24, r: 24, type: 'helmet' }], blocks: [{ x: 650, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 930, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 630, y: GROUND_Y - 132, w: 324, h: 22, type: 'stone' }, { x: 740, y: GROUND_Y - 220, w: 20, h: 88, type: 'wood' }, { x: 840, y: GROUND_Y - 220, w: 20, h: 88, type: 'glass' }, { x: 720, y: GROUND_Y - 242, w: 150, h: 22, type: 'stone' }] },
-    // 🌙 НОЧЬ
+    // 🌙 НОЧЬ (Здесь теперь Стеклянная База вместо одного из уровней)
     { name: 'Тёмная роща', biome: 'night', birds: ['black', 'black', 'red'], pigs: [{ x: 750, y: GROUND_Y - 24, r: 24 }, { x: 870, y: GROUND_Y - 24, r: 24 }, { x: 810, y: GROUND_Y - 130, r: 22 }], blocks: [{ x: 720, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 850, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 700, y: GROUND_Y - 132, w: 184, h: 22, type: 'wood' }, { x: 780, y: GROUND_Y - 210, w: 20, h: 78, type: 'glass' }, { x: 830, y: GROUND_Y - 210, w: 20, h: 78, type: 'glass' }, { x: 760, y: GROUND_Y - 230, w: 110, h: 20, type: 'wood' }] },
-    { name: 'Лунный бастион', biome: 'night', birds: ['yellow', 'blue', 'black', 'white'], pigs: [{ x: 800, y: GROUND_Y - 32, r: 32, type: 'boss' }, { x: 700, y: GROUND_Y - 22, r: 22, type: 'helmet' }, { x: 900, y: GROUND_Y - 22, r: 22, type: 'helmet' }], blocks: [{ x: 670, y: GROUND_Y - 100, w: 22, h: 100, type: 'stone' }, { x: 910, y: GROUND_Y - 100, w: 22, h: 100, type: 'stone' }, { x: 650, y: GROUND_Y - 122, w: 304, h: 22, type: 'stone' }, { x: 750, y: GROUND_Y - 200, w: 20, h: 78, type: 'glass' }, { x: 850, y: GROUND_Y - 200, w: 20, h: 78, type: 'glass' }, { x: 730, y: GROUND_Y - 222, w: 150, h: 22, type: 'wood' }] },
+    { name: 'Стеклянная База', biome: 'night', birds: ['red', 'yellow', 'blue', 'black', 'white'], pigs: [
+        { x: 700, y: GROUND_Y - 22, r: 22 }, { x: 780, y: GROUND_Y - 22, r: 22 }, { x: 860, y: GROUND_Y - 22, r: 22 }, { x: 940, y: GROUND_Y - 22, r: 22 },
+        { x: 740, y: GROUND_Y - 76, r: 22 }, { x: 820, y: GROUND_Y - 76, r: 22 }, { x: 900, y: GROUND_Y - 76, r: 22 },
+        { x: 780, y: GROUND_Y - 130, r: 22 }, { x: 860, y: GROUND_Y - 130, r: 22 },
+        { x: 820, y: GROUND_Y - 184, r: 22 }
+    ], blocks: [
+        { x: 680, y: GROUND_Y - 50, w: 280, h: 10, type: 'glass' },
+        { x: 720, y: GROUND_Y - 104, w: 200, h: 10, type: 'glass' },
+        { x: 760, y: GROUND_Y - 158, w: 120, h: 10, type: 'glass' },
+        { x: 800, y: GROUND_Y - 210, w: 40, h: 10, type: 'glass' },
+        { x: 690, y: GROUND_Y - 50, w: 10, h: 50, type: 'glass' },
+        { x: 730, y: GROUND_Y - 104, w: 10, h: 54, type: 'glass' },
+        { x: 770, y: GROUND_Y - 158, w: 10, h: 54, type: 'glass' },
+        { x: 810, y: GROUND_Y - 210, w: 10, h: 52, type: 'glass' }
+    ] },
     { name: 'Ночной дозор', biome: 'night', birds: ['red', 'blue', 'yellow', 'black'], pigs: [{ x: 740, y: GROUND_Y - 24, r: 24, type: 'helmet' }, { x: 860, y: GROUND_Y - 24, r: 24, type: 'helmet' }, { x: 800, y: GROUND_Y - 160, r: 24 }], blocks: [{ x: 710, y: GROUND_Y - 130, w: 22, h: 130, type: 'wood' }, { x: 840, y: GROUND_Y - 130, w: 22, h: 130, type: 'wood' }, { x: 690, y: GROUND_Y - 152, w: 184, h: 22, type: 'stone' }, { x: 770, y: GROUND_Y - 240, w: 20, h: 88, type: 'glass' }, { x: 830, y: GROUND_Y - 240, w: 20, h: 88, type: 'glass' }, { x: 750, y: GROUND_Y - 262, w: 110, h: 22, type: 'wood' }] },
     { name: 'Полнолуние', biome: 'night', birds: ['yellow', 'black', 'blue', 'red'], pigs: [{ x: 760, y: GROUND_Y - 22, r: 22, type: 'spike' }, { x: 880, y: GROUND_Y - 22, r: 22, type: 'spike' }, { x: 820, y: GROUND_Y - 170, r: 24, type: 'bomber' }], blocks: [{ x: 730, y: GROUND_Y - 140, w: 22, h: 140, type: 'stone' }, { x: 860, y: GROUND_Y - 140, w: 22, h: 140, type: 'stone' }, { x: 710, y: GROUND_Y - 162, w: 184, h: 22, type: 'stone' }, { x: 780, y: GROUND_Y - 250, w: 20, h: 88, type: 'wood' }, { x: 840, y: GROUND_Y - 250, w: 20, h: 88, type: 'wood' }, { x: 760, y: GROUND_Y - 272, w: 120, h: 22, type: 'stone' }] },
     { name: 'Король ночи', biome: 'night', birds: ['red', 'yellow', 'black', 'white', 'blue'], pigs: [{ x: 800, y: GROUND_Y - 38, r: 38, type: 'boss' }, { x: 680, y: GROUND_Y - 24, r: 24, type: 'shield' }, { x: 920, y: GROUND_Y - 24, r: 24, type: 'shield' }], blocks: [{ x: 650, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 930, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 630, y: GROUND_Y - 132, w: 324, h: 22, type: 'stone' }, { x: 740, y: GROUND_Y - 220, w: 20, h: 88, type: 'glass' }, { x: 840, y: GROUND_Y - 220, w: 20, h: 88, type: 'glass' }, { x: 720, y: GROUND_Y - 242, w: 150, h: 22, type: 'wood' }] },
@@ -397,33 +426,54 @@ const LEVELS = [
     { name: 'Дремучий бор', biome: 'forest', birds: ['black', 'blue', 'yellow', 'red'], pigs: [{ x: 740, y: GROUND_Y - 22, r: 22, type: 'helmet' }, { x: 860, y: GROUND_Y - 22, r: 22, type: 'helmet' }, { x: 800, y: GROUND_Y - 160, r: 24 }], blocks: [{ x: 710, y: GROUND_Y - 130, w: 22, h: 130, type: 'wood' }, { x: 840, y: GROUND_Y - 130, w: 22, h: 130, type: 'wood' }, { x: 690, y: GROUND_Y - 152, w: 184, h: 22, type: 'wood' }, { x: 770, y: GROUND_Y - 240, w: 20, h: 88, type: 'wood' }, { x: 830, y: GROUND_Y - 240, w: 20, h: 88, type: 'wood' }, { x: 750, y: GROUND_Y - 262, w: 110, h: 22, type: 'wood' }] },
     { name: 'Лесные духи', biome: 'forest', birds: ['blue', 'yellow', 'red', 'black'], pigs: [{ x: 730, y: GROUND_Y - 22, r: 22, type: 'balloon' }, { x: 850, y: GROUND_Y - 22, r: 22, type: 'balloon' }, { x: 790, y: GROUND_Y - 160, r: 24 }], blocks: [{ x: 700, y: GROUND_Y - 130, w: 22, h: 130, type: 'wood' }, { x: 830, y: GROUND_Y - 130, w: 22, h: 130, type: 'wood' }, { x: 680, y: GROUND_Y - 152, w: 184, h: 22, type: 'wood' }, { x: 760, y: GROUND_Y - 240, w: 20, h: 88, type: 'glass' }, { x: 820, y: GROUND_Y - 240, w: 20, h: 88, type: 'glass' }, { x: 740, y: GROUND_Y - 262, w: 110, h: 22, type: 'wood' }] },
     { name: 'Лесной дух', biome: 'forest', birds: ['black', 'yellow', 'red', 'white'], pigs: [{ x: 800, y: GROUND_Y - 32, r: 32, type: 'shield' }, { x: 690, y: GROUND_Y - 22, r: 22, type: 'helmet' }, { x: 910, y: GROUND_Y - 22, r: 22, type: 'helmet' }], blocks: [{ x: 650, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 930, y: GROUND_Y - 100, w: 22, h: 100, type: 'wood' }, { x: 630, y: GROUND_Y - 122, w: 324, h: 22, type: 'wood' }, { x: 740, y: GROUND_Y - 210, w: 20, h: 88, type: 'glass' }, { x: 840, y: GROUND_Y - 210, w: 20, h: 88, type: 'glass' }, { x: 720, y: GROUND_Y - 232, w: 150, h: 22, type: 'wood' }] },
-    { name: 'Дракон чащи', biome: 'forest', birds: ['red', 'black', 'yellow', 'white', 'blue'], pigs: [{ x: 800, y: GROUND_Y - 38, r: 38, type: 'boss' }, { x: 680, y: GROUND_Y - 24, r: 24, type: 'spike' }, { x: 920, y: GROUND_Y - 24, r: 24, type: 'shield' }], blocks: [{ x: 650, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 930, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 630, y: GROUND_Y - 132, w: 324, h: 22, type: 'wood' }, { x: 740, y: GROUND_Y - 220, w: 20, h: 88, type: 'glass' }, { x: 840, y: GROUND_Y - 220, w: 20, h: 88, type: 'glass' }, { x: 720, y: GROUND_Y - 242, w: 150, h: 22, type: 'wood' }] },
-    // УРОВЕНЬ ЛЕКСА
-    { name: 'Башня Лекса', biome: 'day', birds: ['red', 'red', 'red', 'red', 'red', 'red'], pigs: [
-        { x: 800, y: GROUND_Y - 20, r: 20 }, { x: 800, y: GROUND_Y - 60, r: 20 }, { x: 800, y: GROUND_Y - 100, r: 20 }, 
-        { x: 800, y: GROUND_Y - 140, r: 20 }, { x: 800, y: GROUND_Y - 180, r: 20 }, { x: 800, y: GROUND_Y - 220, r: 20 }
-    ], blocks: [
-        { x: 770, y: GROUND_Y - 240, w: 60, h: 10, type: 'wood' },
-        { x: 770, y: GROUND_Y - 200, w: 60, h: 10, type: 'wood' },
-        { x: 770, y: GROUND_Y - 160, w: 60, h: 10, type: 'wood' },
-        { x: 770, y: GROUND_Y - 120, w: 60, h: 10, type: 'wood' },
-        { x: 770, y: GROUND_Y - 80, w: 60, h: 10, type: 'wood' },
-        { x: 770, y: GROUND_Y - 40, w: 60, h: 10, type: 'wood' }
-    ] }
+    { name: 'Дракон чащи', biome: 'forest', birds: ['red', 'black', 'yellow', 'white', 'blue'], pigs: [{ x: 800, y: GROUND_Y - 38, r: 38, type: 'boss' }, { x: 680, y: GROUND_Y - 24, r: 24, type: 'spike' }, { x: 920, y: GROUND_Y - 24, r: 24, type: 'shield' }], blocks: [{ x: 650, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 930, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 630, y: GROUND_Y - 132, w: 324, h: 22, type: 'wood' }, { x: 740, y: GROUND_Y - 220, w: 20, h: 88, type: 'glass' }, { x: 840, y: GROUND_Y - 220, w: 20, h: 88, type: 'glass' }, { x: 720, y: GROUND_Y - 242, w: 150, h: 22, type: 'wood' }] }
 ];
 
-// ======================== ДОСТИЖЕНИЯ ========================
+// ======================== ДОСТИЖЕНИЯ (30 ШТУК) ========================
 const ACHIEVEMENTS = {
+    // Прохождение
     firstWin: { icon: '🎯', name: 'Первая победа', desc: 'Пройди 1 уровень', cond: () => Object.keys(saveData.levels).length >= 1 },
-    threeStars: { icon: '⭐', name: 'Идеально!', desc: 'Получи 3 звезды', cond: () => Object.values(saveData.levels).some(l => l.stars === 3) },
     tenLvls: { icon: '🏆', name: 'Опытный', desc: 'Пройди 15 уровней', cond: () => Object.keys(saveData.levels).length >= 15 },
+    thirtyLvls: { icon: '🎖️', name: 'Ветеран', desc: 'Пройди 30 уровней', cond: () => Object.keys(saveData.levels).length >= 30 },
     allLvls: { icon: '👑', name: 'Мастер', desc: 'Пройди все уровни', cond: () => Object.keys(saveData.levels).length >= LEVELS.length },
-    pig50: { icon: '🐷', name: 'Охотник', desc: 'Убей 50 свиней', cond: () => saveData.stats.pigs >= 50 },
+    
+    // Звёзды
+    firstStar: { icon: '⭐', name: 'Первая звезда', desc: 'Получи первую звезду', cond: () => Object.values(saveData.levels).some(l => l.stars >= 1) },
+    threeStars: { icon: '✨', name: 'Идеально!', desc: 'Получи 3 звезды за уровень', cond: () => Object.values(saveData.levels).some(l => l.stars === 3) },
+    stars30: { icon: '🌟', name: 'Звездопад', desc: 'Собери 30 звёзд', cond: () => { let t=0; Object.values(saveData.levels).forEach(l=>t+=(l.stars||0)); return t>=30; } },
+    stars60: { icon: '💫', name: 'Сияние', desc: 'Собери 60 звёзд', cond: () => { let t=0; Object.values(saveData.levels).forEach(l=>t+=(l.stars||0)); return t>=60; } },
+    stars100: { icon: '🌠', name: 'Перфекционист', desc: 'Собери 100 звёзд', cond: () => { let t=0; Object.values(saveData.levels).forEach(l=>t+=(l.stars||0)); return t>=100; } },
+
+    // Свиньи
+    pig10: { icon: '🐷', name: 'Первая кровь', desc: 'Убей 10 свиней', cond: () => saveData.stats.pigs >= 10 },
+    pig50: { icon: '🐖', name: 'Охотник', desc: 'Убей 50 свиней', cond: () => saveData.stats.pigs >= 50 },
     pig150: { icon: '💀', name: 'Истребитель', desc: 'Убей 150 свиней', cond: () => saveData.stats.pigs >= 150 },
+    pig300: { icon: '⚔️', name: 'Гроза свиней', desc: 'Убей 300 свиней', cond: () => saveData.stats.pigs >= 300 },
+    
+    // Птицы
+    bird10: { icon: '🐣', name: 'Новичок', desc: 'Запусти 10 птиц', cond: () => saveData.stats.birds >= 10 },
+    bird50: { icon: '🐥', name: 'Стрелок', desc: 'Запусти 50 птиц', cond: () => saveData.stats.birds >= 50 },
     bird100: { icon: '🐦', name: 'Птицелов', desc: 'Запусти 100 птиц', cond: () => saveData.stats.birds >= 100 },
+    bird300: { icon: '🦅', name: 'Соколиный глаз', desc: 'Запусти 300 птиц', cond: () => saveData.stats.birds >= 300 },
+
+    // Разрушение
+    block50: { icon: '🧱', name: 'Крушитель', desc: 'Сломай 50 блоков', cond: () => saveData.stats.blocks >= 50 },
     block150: { icon: '🪓', name: 'Разрушитель', desc: 'Сломай 150 блоков', cond: () => saveData.stats.blocks >= 150 },
-    ability30: { icon: '⚡', name: 'Мастер силы', desc: 'Используй 30 способностей', cond: () => saveData.stats.abilities >= 30 },
-    drown: { icon: '🌊', name: 'Утопленник', desc: 'Утопи птицу в болоте', cond: () => saveData.stats.drowned >= 1 }
+    block500: { icon: '🏗️', name: 'Снос зданий', desc: 'Сломай 500 блоков', cond: () => saveData.stats.blocks >= 500 },
+
+    // Способности
+    ability10: { icon: '⚡', name: 'Искра', desc: 'Используй 10 способностей', cond: () => saveData.stats.abilities >= 10 },
+    ability30: { icon: '🔥', name: 'Мастер силы', desc: 'Используй 30 способностей', cond: () => saveData.stats.abilities >= 30 },
+    ability100: { icon: '💥', name: 'Бог грома', desc: 'Используй 100 способностей', cond: () => saveData.stats.abilities >= 100 },
+
+    // Секретные и редкие
+    drown: { icon: '🌊', name: 'Утопленник', desc: 'Утопи птицу в болоте', cond: () => saveData.stats.drowned >= 1 },
+    drown5: { icon: '🦈', name: 'Корм для рыб', desc: 'Утопи 5 птиц', cond: () => saveData.stats.drowned >= 5 },
+    bossKill: { icon: '👹', name: 'Убийца боссов', desc: 'Убей любого босса', cond: () => saveData.stats.pigs >= 1 },
+    bomberKill: { icon: '💣', name: 'Сапёр', desc: 'Взорви свинью с динамитом', cond: () => saveData.stats.pigs >= 1 },
+    perfectLevel: { icon: '🥇', name: 'Безупречно', desc: 'Пройди уровень, используя 1 птицу', cond: () => Object.values(saveData.levels).some(l => l.score > 40000) },
+    rich: { icon: '💰', name: 'Богач', desc: 'Набери 500,000 очков за всё время', cond: () => Object.values(saveData.levels).reduce((s,l)=>s+l.score,0) >= 500000 },
+    allStarsHard: { icon: '🧠', name: 'Гений', desc: 'Пройди все уровни на 3 звезды', cond: () => { let t=0, c=0; Object.values(saveData.levels).forEach(l=>{t+=(l.stars||0); c++;}); return c >= LEVELS.length && t >= LEVELS.length*3; } }
 };
 
 // ======================== СОСТОЯНИЕ ========================
@@ -465,12 +515,12 @@ class Bird {
         this.x = slingshot.x; this.y = slingshot.y;
         this.vx = vx; this.vy = vy; this.launched = true; this.resting = false; this.angularVel = 0.18;
         SFX.launch(); spawnFeathers(this.x, this.y, 6, this.type.color1); state.shake = 6;
-        if (!this.isChild) { saveData.stats.birds++; state.birdsUsed++; saveGame(); }
+        if (!this.isChild) { saveData.stats.birds++; state.birdsUsed++; saveGame(); checkAchievements(); }
     }
     activateAbility() {
         if (this.abilityUsed || !this.launched || this.resting || this.drowned) return false;
         const ab = this.type.ability; if (!ab) return false;
-        this.abilityUsed = true; SFX.ability(); state.shake = 5; saveData.stats.abilities++; state.abilitiesUsed++; saveGame();
+        this.abilityUsed = true; SFX.ability(); state.shake = 5; saveData.stats.abilities++; state.abilitiesUsed++; saveGame(); checkAchievements();
         if (ab === 'dash') {
             const sp = Math.hypot(this.vx, this.vy)||1; this.vx = (this.vx/sp)*24; this.vy = (this.vy/sp)*24; this.abilityActive = 30; SFX.dash();
             for(let i=0;i<15;i++) particles.push(new Particle(this.x-this.vx*i*0.3, this.y-this.vy*i*0.3, '#ffe066', {vx:rand(-1,1),vy:rand(-1,1),size:rand(4,8),gravity:0,decay:0.04}));
@@ -642,7 +692,7 @@ class Pig {
         const pts = PIG_PTS[this.type] || 5000;
         state.score += pts; addScore(pts, this.x, this.y);
         SFX.pop(); spawnBurst(this.x, this.y, '#90ee90', 22); spawnFeathers(this.x, this.y, 6, '#90ee90');
-        state.shake = 8; saveData.stats.pigs++; saveGame();
+        state.shake = 8; saveData.stats.pigs++; saveGame(); checkAchievements();
 
         if (this.type === 'bomber') {
             const R = 110;
@@ -692,15 +742,16 @@ class Pig {
             for (let i = 0; i < PHYS_SUBSTEPS; i++) {
                 if (inWater) { this.vy *= 0.88; this.vy -= 0.05; this.vx *= 0.90; }
                 else { this.vy += GRAVITY * biome.gravityMult * sub; }
-                this.vx *= Math.pow(biome.friction, sub * 60);
-                this.vy *= Math.pow(biome.friction, sub * 60);
+                const fric = Math.max(0.85, biome.friction);
+                this.vx *= Math.pow(fric, sub * 60);
+                this.vy *= Math.pow(fric, sub * 60);
                 this.x += this.vx * sub;
                 this.y += this.vy * sub;
             }
             const groundThis = inWater ? GROUND_Y - 4 : GROUND_Y;
             if (this.y + this.r >= groundThis) {
                 this.y = groundThis - this.r;
-                if (!inWater && Math.abs(this.vy) > 4) this.damage(Math.abs(this.vy) * 3);
+                if (!inWater && this.vy > 6) this.damage(this.vy * 2);
                 this.vy *= inWater ? -0.1 : -0.35;
                 this.vx *= inWater ? 0.85 : 0.7;
                 if (Math.abs(this.vy) < 1.2 && Math.abs(this.vx) < (inWater ? 1.2 : 0.7)) { this.vy = 0; this.vx = 0; this.resting = true; }
@@ -801,7 +852,7 @@ class Block {
             spawnBurst(this.x+this.w/2, this.y+this.h/2, col, settings.highGraphics ? 14 : 6);
             const pts = this.type==='glass' ? 200 : 500;
             state.score += pts; addScore(pts, this.x+this.w/2, this.y+this.h/2);
-            saveData.stats.blocks++; saveGame();
+            saveData.stats.blocks++; saveGame(); checkAchievements();
         } else { this.resting = false; }
     }
     update() {
@@ -813,14 +864,13 @@ class Block {
         const sub = 1 / PHYS_SUBSTEPS;
         for (let i = 0; i < PHYS_SUBSTEPS; i++) {
             this.vy += GRAVITY * biome.gravityMult * sub;
-            // ИСПРАВЛЕНИЕ БАГА: Ограничиваем трение, чтобы блоки не телепортировались
-            this.vx *= Math.pow(0.998, sub * 60);
-            this.vy *= Math.pow(0.998, sub * 60);
+            const fric = Math.max(0.85, biome.friction);
+            this.vx *= Math.pow(fric * 0.999, sub * 60);
+            this.vy *= Math.pow(0.999, sub * 60);
             this.x += this.vx * sub;
             this.y += this.vy * sub;
             this.rot += this.rotVel * sub;
-            // Защита от вылета за экран (телепортации)
-            if (this.x < -500 || this.x > W + 500) { this.x = clamp(this.x, 0, W - this.w); this.vx = 0; }
+            if (this.x < -300 || this.x > W + 300) { this.x = clamp(this.x, 0, W - this.w); this.vx = 0; }
         }
         if (this.y + this.h >= GROUND_Y) {
             this.y = GROUND_Y - this.h;
@@ -1093,16 +1143,15 @@ function updatePhysics() {
         }
     }
 
-    // ИСПРАВЛЕНИЕ СОФТЛОКА: 300 кадров = 5 секунд. Если птица не остановилась, ход передается.
+    // Жесткий общий таймер на ход (4.5 секунды - 270 кадров)
     if (state.phase === 'flying' && !state.gameEnded) {
-        const anyFlying = birds.some(b => b.launched && !b.resting && !b.drowned && b.y < H + 100);
-        if (!anyFlying || state.time - state.launchTime > 300) endShot();
+        const allBirdsStopped = birds.every(b => !b.launched || b.resting || b.drowned || (Math.abs(b.vx) < 0.1 && Math.abs(b.vy) < 0.1));
+        if (allBirdsStopped || state.time - state.launchTime > 270) endShot();
     }
 }
 
 // ======================== ЛОГИКА ========================
 function isLevelUnlocked(idx) {
-    if (settings.unlockAll) return true;
     return idx === 0 || saveData.levels[idx - 1] !== undefined || saveData.levels[idx] !== undefined;
 }
 
@@ -1227,7 +1276,7 @@ function showAchievementToast(ach) {
     setTimeout(() => toast.classList.remove('show'), 3500);
 }
 
-// ======================== ВВОД ========================
+// ======================== ВВОД (Мышь / Тач / Геймпад) ========================
 function getMouse(e) {
     const rect = canvas.getBoundingClientRect(), scaleX = W / rect.width, scaleY = H / rect.height;
     let cx, cy;
@@ -1280,6 +1329,46 @@ canvas.addEventListener('touchmove', (e) => { e.preventDefault(); onMove(e); }, 
 canvas.addEventListener('touchend', (e) => { e.preventDefault(); onUp(e); }, { passive: false });
 canvas.addEventListener('touchcancel', (e) => { e.preventDefault(); onUp(e); }, { passive: false });
 
+// Геймпад
+let gamepadAiming = false;
+function pollGamepad() {
+    const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+    const gp = gamepads[0];
+    if (!gp) return;
+    
+    const now = performance.now();
+    if (state.phase === 'flying' && gp.buttons[0].pressed && now - lastAbilityTime > 300) {
+        const fb = birds.find(b => b.launched && !b.resting && !b.abilityUsed && b.type.ability);
+        if (fb) { lastAbilityTime = now; fb.activateAbility(); updateAbilityIndicator(); }
+    }
+
+    const stickX = gp.axes[0], stickY = gp.axes[1];
+    const dpadX = (gp.buttons[15].pressed ? 1 : 0) - (gp.buttons[14].pressed ? 1 : 0);
+    const dpadY = (gp.buttons[13].pressed ? 1 : 0) - (gp.buttons[12].pressed ? 1 : 0);
+    const ax = Math.abs(stickX) > 0.2 ? stickX : dpadX;
+    const ay = Math.abs(stickY) > 0.2 ? stickY : dpadY;
+
+    if (state.phase === 'idle' && !bird.launched) {
+        if (Math.abs(ax) > 0.1 || Math.abs(ay) > 0.1) {
+            if (!gamepadAiming) { gamepadAiming = true; state.dragging = true; state.phase = 'aiming'; SFX.pull(); }
+            let dx = ax * MAX_PULL, dy = ay * MAX_PULL;
+            if (dx > 0) dx = 0; // Только назад
+            bird.x = slingshot.x + dx; bird.y = slingshot.y + dy; bird.angle = Math.atan2(-dy, -dx);
+        } else if (gamepadAiming) {
+            gamepadAiming = false;
+            const dx = slingshot.x - bird.x, dy = slingshot.y - bird.y, power = Math.hypot(dx, dy);
+            if (power < 18) { bird.x = slingshot.x; bird.y = slingshot.y; bird.angle = 0; state.phase = 'idle'; state.dragging = false; }
+            else {
+                const angle = Math.atan2(dy, dx), vx = Math.cos(angle) * power * LAUNCH_MULT, vy = Math.sin(angle) * power * LAUNCH_MULT;
+                bird.launch(vx, vy); bird.angle = Math.atan2(vy, vx);
+                state.phase = 'flying'; state.launchTime = state.time; hint.style.opacity = '0'; updateAbilityIndicator();
+                state.dragging = false;
+            }
+        }
+    }
+}
+setInterval(pollGamepad, 16);
+
 // ======================== UI СОБЫТИЯ ========================
 playBtn.addEventListener('click', () => { ensureAudio(); startMusic(); menuScreen.classList.remove('show'); levelsScreen.classList.remove('show'); showGameUI(); loadLevel(0); });
 levelsBtn.addEventListener('click', () => { ensureAudio(); startMusic(); menuScreen.classList.remove('show'); buildLevelsGrid(); levelsScreen.classList.add('show'); });
@@ -1295,7 +1384,6 @@ soundToggle.addEventListener('click', () => { settings.sound = !settings.sound; 
 physicsToggle.addEventListener('click', () => { settings.perfectPhysics = !settings.perfectPhysics; saveSettings(); });
 graphicsToggle.addEventListener('click', () => { settings.highGraphics = !settings.highGraphics; saveSettings(); });
 fpsToggle.addEventListener('click', () => { settings.showFps = !settings.showFps; saveSettings(); });
-unlockAllBtn.addEventListener('click', () => { settings.unlockAll = !settings.unlockAll; saveSettings(); buildLevelsGrid(); });
 resetSaveBtn.addEventListener('click', () => { if(confirm('Удалить весь прогресс?')) { localStorage.removeItem(SAVE_KEY); loadSave(); updateHUD(); buildLevelsGrid(); alert('Прогресс сброшен!'); } });
 
 restartBtn.addEventListener('click', () => { ensureAudio(); loadLevel(currentLevelIdx); });
