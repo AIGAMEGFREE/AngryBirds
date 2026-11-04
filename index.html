@@ -43,6 +43,7 @@
     .menu-btn.secondary { background: linear-gradient(180deg, #4dabf7, #1971c2); }
     .menu-btn.quaternary{ background: linear-gradient(180deg, #f76b8a, #c9184a); }
     .menu-btn.settings  { background: linear-gradient(180deg, #667eea, #764ba2); }
+    .menu-btn.news      { background: linear-gradient(180deg, #ffd93d, #f7a11a); color: #4a3b2a; }
     .levels-screen { position: absolute; inset: 0; z-index: 110; display: flex; flex-direction: column; align-items: center; background: linear-gradient(180deg, #1a2151 0%, #3d4d8c 50%, #7a6bb0 100%); border-radius: 14px; opacity: 0; pointer-events: none; transition: opacity 0.5s; padding: 30px 20px; overflow-y: auto; }
     .levels-screen.show { opacity: 1; pointer-events: auto; }
     .levels-header { display: flex; align-items: center; justify-content: space-between; width: min(1000px, 100%); margin-bottom: 24px; }
@@ -74,6 +75,17 @@
     .setting-btn.on { background: #4cd964; color: white; }
     .setting-btn.off { background: #ff3b30; color: white; }
     .setting-btn.neutral { background: rgba(255,255,255,0.2); color: white; }
+    
+    /* Стили для Новостей Патчей */
+    .news-container { width: min(800px, 100%); display: flex; flex-direction: column; gap: 16px; margin-top: 10px; padding-bottom: 40px; }
+    .news-card { background: rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; color: white; border-left: 6px solid #4dabf7; backdrop-filter: blur(10px); }
+    .news-version { font-size: 24px; font-weight: 900; color: #ffd93d; margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .news-date { font-size: 14px; color: #aaa; font-weight: 600; }
+    .news-list { margin-top: 12px; padding-left: 20px; line-height: 1.6; font-size: 15px; }
+    .news-list li { margin-bottom: 8px; }
+    .news-list li strong { color: #ff9a3c; }
+    .news-badge { display: inline-block; background: #e63946; color: white; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: bold; margin-left: 10px; vertical-align: middle; }
+
     #achievementsGrid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important; }
     @media (max-width: 700px) {
         .hint { display: none; }
@@ -89,6 +101,8 @@
         .overlay-stars { font-size: 36px; }
         .hazard-badge { font-size: 9px; }
         #achievementsGrid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; }
+        .news-version { font-size: 20px; }
+        .news-list { font-size: 13px; }
     }
     @media (max-width: 480px) {
         .menu-title { font-size: 38px; }
@@ -111,6 +125,8 @@
         #score { font-size: 13px; }
         .controls { bottom: 10px; right: 10px; }
         .controls button.btn { padding: 8px 10px; font-size: 11px; }
+        .news-card { padding: 14px; }
+        .news-version { font-size: 18px; }
     }
 </style>
 </head>
@@ -148,6 +164,7 @@
             <button class="menu-btn primary" id="playBtn">🎮 Играть</button>
             <button class="menu-btn secondary" id="levelsBtn">🗺️ Уровни</button>
             <button class="menu-btn quaternary" id="achievementsBtn">🏆 Награды</button>
+            <button class="menu-btn news" id="newsBtn">📰 Новости патчей</button>
             <button class="menu-btn settings" id="settingsBtn">⚙️ Настройки</button>
         </div>
     </div>
@@ -159,6 +176,54 @@
         <div class="levels-header"><div class="levels-title">🏆 Награды</div><button class="btn-back" id="achBackBtn">← Назад</button></div>
         <div class="levels-grid" id="achievementsGrid"></div>
     </div>
+    
+    <!-- Новый экран Новостей -->
+    <div class="levels-screen" id="newsScreen" style="z-index: 116;">
+        <div class="levels-header"><div class="levels-title">📰 Новости патчей</div><button class="btn-back" id="newsBackBtn">← Назад</button></div>
+        <div class="news-container">
+            <div class="news-card" style="border-left-color: #4cd964;">
+                <div class="news-version">Версия 1.2.4 (Текущая) <span class="news-date">Сегодня</span></div>
+                <ul class="news-list">
+                    <li><strong>Новости патчей:</strong> Добавлен этот экран!</li>
+                    <li><strong>Достижения:</strong> Количество наград увеличено до 30!</li>
+                    <li><strong>Уровни:</strong> Добавлен мемный уровень "Стеклянная База" от Лекса.</li>
+                    <li><strong>Оптимизация:</strong> Добавлена поддержка геймпадов (джойстиков) и адаптация под планшеты.</li>
+                </ul>
+            </div>
+            <div class="news-card" style="border-left-color: #ffd93d;">
+                <div class="news-version">Версия 1.2.3 <span class="news-date">Недавно</span></div>
+                <ul class="news-list">
+                    <li><strong>Фикс софтлока:</strong> Если птица застревает на блоке дольше 3 секунд, ход передается следующей. Игра больше не зависает!</li>
+                    <li><strong>Название:</strong> Уровень 2 переименован в "Башня".</li>
+                    <li><strong>Баланс:</strong> Убраны неканоничные свинки (призраки, роботы).</li>
+                </ul>
+            </div>
+            <div class="news-card" style="border-left-color: #e63946;">
+                <div class="news-version">Версия 1.2.0 <span class="news-date">Ранее</span></div>
+                <ul class="news-list">
+                    <li><strong>Уровень Лекса:</strong> Добавлен 2-й уровень "Башня" с 5-ю птицами Чак (идея от Лекса).</li>
+                    <li><strong>Титры:</strong> Бета-тестер Mr.R добавлен в список авторов.</li>
+                    <li><strong>Настройки:</strong> Удалена кнопка "Все уровни" (читерство).</li>
+                </ul>
+            </div>
+            <div class="news-card" style="border-left-color: #7e57c2;">
+                <div class="news-version">Версия 1.1.0 <span class="news-date">Раннее</span></div>
+                <ul class="news-list">
+                    <li><strong>Оптимизация:</strong> Игра адаптирована под слабые мобильные устройства.</li>
+                    <li><strong>Физика:</strong> Исправлена телепортация блоков и баг с самостоятельной смертью свиней.</li>
+                    <li><strong>Графика:</strong> Добавлен рендеринг высокого разрешения (Retina).</li>
+                </ul>
+            </div>
+            <div class="news-card" style="border-left-color: #888;">
+                <div class="news-version">Версия 1.0.0 <span class="news-date">Релиз</span></div>
+                <ul class="news-list">
+                    <li><strong>Релиз:</strong> Базовые 45 уровней, 10 биомов, 5 видов птиц.</li>
+                    <li><strong>Механики:</strong> Вода (болото), ветер, гололёд, взрывы.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <div class="settings-screen" id="settingsScreen">
         <div class="levels-header" style="position: absolute; top: 24px; width: min(1000px, 100%);">
             <div class="levels-title">⚙️ Настройки</div>
@@ -222,14 +287,17 @@ const playAgainBtn = $('playAgainBtn'), nextOverlayBtn = $('nextOverlayBtn'), ov
 const restartBtn = $('restartBtn'), menuBtn = $('menuBtn');
 const menuScreen = $('menuScreen'), levelsScreen = $('levelsScreen'), levelsContainer = $('levelsContainer'), playBtn = $('playBtn'), levelsBtn = $('levelsBtn'), backBtn = $('backBtn');
 const achievementsBtn = $('achievementsBtn'), achievementsScreen = $('achievementsScreen'), achievementsGrid = $('achievementsGrid'), achBackBtn = $('achBackBtn');
+const newsBtn = $('newsBtn'), newsScreen = $('newsScreen'), newsBackBtn = $('newsBackBtn');
 const settingsBtn = $('settingsBtn'), settingsScreen = $('settingsScreen'), settingsBackBtn = $('settingsBackBtn');
 const musicToggle = $('musicToggle'), soundToggle = $('soundToggle'), physicsToggle = $('physicsToggle'), graphicsToggle = $('graphicsToggle'), fpsToggle = $('fpsToggle'), authorsBtn = $('authorsBtn'), resetSaveBtn = $('resetSaveBtn');
 const creditsScreen = $('creditsScreen'), creditsBackBtn = $('creditsBackBtn');
 const fpsCounter = $('fps-counter');
 
 // ======================== КОНСТАНТЫ ========================
+const CURRENT_VERSION = '1.2.4';
 const SAVE_KEY = 'angryBirds_ultimate_v124';
 const SETTINGS_KEY = 'angryBirds_settings_v124';
+const VERSION_KEY = 'angryBirds_lastSeenVersion';
 const GRAVITY = 0.42;
 const GROUND_Y = H - 78;
 const MAX_PULL = 140;
@@ -372,7 +440,7 @@ const LEVELS = [
     { name: 'Сфинкс', biome: 'desert', birds: ['yellow', 'red', 'black', 'white'], pigs: [{ x: 780, y: GROUND_Y - 22, r: 22, type: 'shield' }, { x: 680, y: GROUND_Y - 22, r: 22, type: 'helmet' }, { x: 880, y: GROUND_Y - 22, r: 22, type: 'helmet' }, { x: 780, y: GROUND_Y - 170, r: 24 }], blocks: [{ x: 650, y: GROUND_Y - 100, w: 22, h: 100, type: 'stone' }, { x: 910, y: GROUND_Y - 100, w: 22, h: 100, type: 'stone' }, { x: 630, y: GROUND_Y - 122, w: 304, h: 22, type: 'stone' }, { x: 720, y: GROUND_Y - 210, w: 20, h: 88, type: 'wood' }, { x: 840, y: GROUND_Y - 210, w: 20, h: 88, type: 'glass' }, { x: 700, y: GROUND_Y - 232, w: 170, h: 22, type: 'stone' }] },
     { name: 'Барханы', biome: 'desert', birds: ['black', 'black', 'blue', 'yellow'], pigs: [{ x: 750, y: GROUND_Y - 24, r: 24, type: 'bomber' }, { x: 870, y: GROUND_Y - 24, r: 24 }, { x: 810, y: GROUND_Y - 150, r: 24 }], blocks: [{ x: 720, y: GROUND_Y - 130, w: 22, h: 130, type: 'stone' }, { x: 850, y: GROUND_Y - 130, w: 22, h: 130, type: 'stone' }, { x: 700, y: GROUND_Y - 152, w: 174, h: 22, type: 'stone' }, { x: 780, y: GROUND_Y - 240, w: 20, h: 88, type: 'wood' }, { x: 830, y: GROUND_Y - 240, w: 20, h: 88, type: 'wood' }, { x: 760, y: GROUND_Y - 262, w: 100, h: 22, type: 'stone' }] },
     { name: 'Фараон', biome: 'desert', birds: ['red', 'yellow', 'black', 'white', 'blue'], pigs: [{ x: 800, y: GROUND_Y - 38, r: 38, type: 'boss' }, { x: 690, y: GROUND_Y - 24, r: 24, type: 'shield' }, { x: 910, y: GROUND_Y - 24, r: 24, type: 'helmet' }], blocks: [{ x: 650, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 930, y: GROUND_Y - 110, w: 22, h: 110, type: 'stone' }, { x: 630, y: GROUND_Y - 132, w: 324, h: 22, type: 'stone' }, { x: 740, y: GROUND_Y - 220, w: 20, h: 88, type: 'wood' }, { x: 840, y: GROUND_Y - 220, w: 20, h: 88, type: 'glass' }, { x: 720, y: GROUND_Y - 242, w: 150, h: 22, type: 'stone' }] },
-    // 🌙 НОЧЬ (Здесь теперь Стеклянная База вместо одного из уровней)
+    // 🌙 НОЧЬ
     { name: 'Тёмная роща', biome: 'night', birds: ['black', 'black', 'red'], pigs: [{ x: 750, y: GROUND_Y - 24, r: 24 }, { x: 870, y: GROUND_Y - 24, r: 24 }, { x: 810, y: GROUND_Y - 130, r: 22 }], blocks: [{ x: 720, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 850, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 700, y: GROUND_Y - 132, w: 184, h: 22, type: 'wood' }, { x: 780, y: GROUND_Y - 210, w: 20, h: 78, type: 'glass' }, { x: 830, y: GROUND_Y - 210, w: 20, h: 78, type: 'glass' }, { x: 760, y: GROUND_Y - 230, w: 110, h: 20, type: 'wood' }] },
     { name: 'Стеклянная База', biome: 'night', birds: ['red', 'yellow', 'blue', 'black', 'white'], pigs: [
         { x: 700, y: GROUND_Y - 22, r: 22 }, { x: 780, y: GROUND_Y - 22, r: 22 }, { x: 860, y: GROUND_Y - 22, r: 22 }, { x: 940, y: GROUND_Y - 22, r: 22 },
@@ -429,44 +497,31 @@ const LEVELS = [
     { name: 'Дракон чащи', biome: 'forest', birds: ['red', 'black', 'yellow', 'white', 'blue'], pigs: [{ x: 800, y: GROUND_Y - 38, r: 38, type: 'boss' }, { x: 680, y: GROUND_Y - 24, r: 24, type: 'spike' }, { x: 920, y: GROUND_Y - 24, r: 24, type: 'shield' }], blocks: [{ x: 650, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 930, y: GROUND_Y - 110, w: 22, h: 110, type: 'wood' }, { x: 630, y: GROUND_Y - 132, w: 324, h: 22, type: 'wood' }, { x: 740, y: GROUND_Y - 220, w: 20, h: 88, type: 'glass' }, { x: 840, y: GROUND_Y - 220, w: 20, h: 88, type: 'glass' }, { x: 720, y: GROUND_Y - 242, w: 150, h: 22, type: 'wood' }] }
 ];
 
-// ======================== ДОСТИЖЕНИЯ (30 ШТУК) ========================
+// ======================== ДОСТИЖЕНИЯ ========================
 const ACHIEVEMENTS = {
-    // Прохождение
     firstWin: { icon: '🎯', name: 'Первая победа', desc: 'Пройди 1 уровень', cond: () => Object.keys(saveData.levels).length >= 1 },
     tenLvls: { icon: '🏆', name: 'Опытный', desc: 'Пройди 15 уровней', cond: () => Object.keys(saveData.levels).length >= 15 },
     thirtyLvls: { icon: '🎖️', name: 'Ветеран', desc: 'Пройди 30 уровней', cond: () => Object.keys(saveData.levels).length >= 30 },
     allLvls: { icon: '👑', name: 'Мастер', desc: 'Пройди все уровни', cond: () => Object.keys(saveData.levels).length >= LEVELS.length },
-    
-    // Звёзды
     firstStar: { icon: '⭐', name: 'Первая звезда', desc: 'Получи первую звезду', cond: () => Object.values(saveData.levels).some(l => l.stars >= 1) },
     threeStars: { icon: '✨', name: 'Идеально!', desc: 'Получи 3 звезды за уровень', cond: () => Object.values(saveData.levels).some(l => l.stars === 3) },
     stars30: { icon: '🌟', name: 'Звездопад', desc: 'Собери 30 звёзд', cond: () => { let t=0; Object.values(saveData.levels).forEach(l=>t+=(l.stars||0)); return t>=30; } },
     stars60: { icon: '💫', name: 'Сияние', desc: 'Собери 60 звёзд', cond: () => { let t=0; Object.values(saveData.levels).forEach(l=>t+=(l.stars||0)); return t>=60; } },
     stars100: { icon: '🌠', name: 'Перфекционист', desc: 'Собери 100 звёзд', cond: () => { let t=0; Object.values(saveData.levels).forEach(l=>t+=(l.stars||0)); return t>=100; } },
-
-    // Свиньи
     pig10: { icon: '🐷', name: 'Первая кровь', desc: 'Убей 10 свиней', cond: () => saveData.stats.pigs >= 10 },
     pig50: { icon: '🐖', name: 'Охотник', desc: 'Убей 50 свиней', cond: () => saveData.stats.pigs >= 50 },
     pig150: { icon: '💀', name: 'Истребитель', desc: 'Убей 150 свиней', cond: () => saveData.stats.pigs >= 150 },
     pig300: { icon: '⚔️', name: 'Гроза свиней', desc: 'Убей 300 свиней', cond: () => saveData.stats.pigs >= 300 },
-    
-    // Птицы
     bird10: { icon: '🐣', name: 'Новичок', desc: 'Запусти 10 птиц', cond: () => saveData.stats.birds >= 10 },
     bird50: { icon: '🐥', name: 'Стрелок', desc: 'Запусти 50 птиц', cond: () => saveData.stats.birds >= 50 },
     bird100: { icon: '🐦', name: 'Птицелов', desc: 'Запусти 100 птиц', cond: () => saveData.stats.birds >= 100 },
     bird300: { icon: '🦅', name: 'Соколиный глаз', desc: 'Запусти 300 птиц', cond: () => saveData.stats.birds >= 300 },
-
-    // Разрушение
     block50: { icon: '🧱', name: 'Крушитель', desc: 'Сломай 50 блоков', cond: () => saveData.stats.blocks >= 50 },
     block150: { icon: '🪓', name: 'Разрушитель', desc: 'Сломай 150 блоков', cond: () => saveData.stats.blocks >= 150 },
     block500: { icon: '🏗️', name: 'Снос зданий', desc: 'Сломай 500 блоков', cond: () => saveData.stats.blocks >= 500 },
-
-    // Способности
     ability10: { icon: '⚡', name: 'Искра', desc: 'Используй 10 способностей', cond: () => saveData.stats.abilities >= 10 },
     ability30: { icon: '🔥', name: 'Мастер силы', desc: 'Используй 30 способностей', cond: () => saveData.stats.abilities >= 30 },
     ability100: { icon: '💥', name: 'Бог грома', desc: 'Используй 100 способностей', cond: () => saveData.stats.abilities >= 100 },
-
-    // Секретные и редкие
     drown: { icon: '🌊', name: 'Утопленник', desc: 'Утопи птицу в болоте', cond: () => saveData.stats.drowned >= 1 },
     drown5: { icon: '🦈', name: 'Корм для рыб', desc: 'Утопи 5 птиц', cond: () => saveData.stats.drowned >= 5 },
     bossKill: { icon: '👹', name: 'Убийца боссов', desc: 'Убей любого босса', cond: () => saveData.stats.pigs >= 1 },
@@ -1373,9 +1428,11 @@ setInterval(pollGamepad, 16);
 playBtn.addEventListener('click', () => { ensureAudio(); startMusic(); menuScreen.classList.remove('show'); levelsScreen.classList.remove('show'); showGameUI(); loadLevel(0); });
 levelsBtn.addEventListener('click', () => { ensureAudio(); startMusic(); menuScreen.classList.remove('show'); buildLevelsGrid(); levelsScreen.classList.add('show'); });
 achievementsBtn.addEventListener('click', () => { menuScreen.classList.remove('show'); buildAchievementsGrid(); achievementsScreen.classList.add('show'); });
+newsBtn.addEventListener('click', () => { menuScreen.classList.remove('show'); newsScreen.classList.add('show'); localStorage.setItem(VERSION_KEY, CURRENT_VERSION); });
 settingsBtn.addEventListener('click', () => { menuScreen.classList.remove('show'); settingsScreen.classList.add('show'); });
 backBtn.addEventListener('click', () => { levelsScreen.classList.remove('show'); menuScreen.classList.add('show'); });
 achBackBtn.addEventListener('click', () => { achievementsScreen.classList.remove('show'); menuScreen.classList.add('show'); });
+newsBackBtn.addEventListener('click', () => { newsScreen.classList.remove('show'); menuScreen.classList.add('show'); });
 settingsBackBtn.addEventListener('click', () => { settingsScreen.classList.remove('show'); menuScreen.classList.add('show'); });
 authorsBtn.addEventListener('click', () => { creditsScreen.classList.add('show'); });
 creditsBackBtn.addEventListener('click', () => { creditsScreen.classList.remove('show'); });
@@ -1511,6 +1568,30 @@ initBackground();
 loadSave();
 updateSettingsUI();
 if (isLowEnd) fpsCounter.style.display = 'none';
+
+// Проверка новой версии
+const lastSeen = localStorage.getItem(VERSION_KEY);
+if (lastSeen !== CURRENT_VERSION) {
+    setTimeout(() => {
+        let toast = document.getElementById('achToast');
+        if (!toast) {
+            toast = document.createElement('div'); toast.id = 'achToast'; toast.className = 'toast-ach';
+            document.body.appendChild(toast);
+        }
+        toast.innerHTML = `<span style="font-size:28px;">📰</span><div><div style="font-size:12px;color:#8a6d00;">Обновление v${CURRENT_VERSION}!</div><div>Добавлены Новости Патчей. Нажми, чтобы прочитать.</div></div>`;
+        toast.classList.add('show');
+        toast.style.pointerEvents = 'auto';
+        toast.style.cursor = 'pointer';
+        toast.onclick = () => {
+            toast.classList.remove('show');
+            menuScreen.classList.remove('show');
+            newsScreen.classList.add('show');
+            localStorage.setItem(VERSION_KEY, CURRENT_VERSION);
+        };
+        setTimeout(() => toast.classList.remove('show'), 8000);
+    }, 1500);
+}
+
 requestAnimationFrame(gameLoop);
 document.addEventListener('pointerdown', () => { ensureAudio(); if (settings.music) startMusic(); }, { once: true });
 
