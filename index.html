@@ -2,12 +2,12 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Angry Birds — Ultimate Edition</title>
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; overflow: hidden; font-family: 'Segoe UI', Tahoma, sans-serif; background: #0a0e27; user-select: none; -webkit-tap-highlight-color: transparent; display: flex; justify-content: center; align-items: center; }
-    #gameWrap { position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; }
+    #gameWrap { position: relative; width: 100%; height: 100vh; height: 100dvh; display: flex; justify-content: center; align-items: center; }
     canvas { display: block; border-radius: 14px; box-shadow: 0 0 0 3px rgba(255,255,255,0.08), 0 25px 70px rgba(0,0,0,0.65); cursor: grab; touch-action: none; max-width: 100%; max-height: 100%; }
     canvas:active { cursor: grabbing; }
     #fps-counter { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.5); color: #0f0; padding: 5px 10px; border-radius: 8px; font-family: monospace; font-weight: bold; z-index: 99; pointer-events: none; display: none; }
@@ -84,10 +84,21 @@
     #achievementsGrid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important; }
     @media (max-width: 700px) { .hint { display: none; } .menu-title { font-size: 52px; } .levels-grid { grid-template-columns: repeat(5, 1fr); } .overlay-card { padding: 32px 34px; } .category-title { font-size: 16px; } .controls { gap: 6px; } .controls button.btn { padding: 10px 14px; font-size: 13px; } .pill { padding: 8px 14px; font-size: 14px; } #score { font-size: 16px; } .overlay-title { font-size: 32px; } .overlay-stars { font-size: 36px; } .hazard-badge { font-size: 9px; } #achievementsGrid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; } .news-version { font-size: 20px; } .news-list { font-size: 13px; } }
     @media (max-width: 480px) { .menu-title { font-size: 38px; } .menu-subtitle { font-size: 14px; letter-spacing: 3px; margin-bottom: 24px; } .menu-btn { padding: 14px 20px; font-size: 16px; } .levels-title { font-size: 28px; } .btn-back { padding: 8px 14px; font-size: 13px; } .levels-grid { grid-template-columns: repeat(4, 1fr); } .overlay-card { padding: 24px 20px; } .overlay-title { font-size: 26px; } .overlay-stars { font-size: 28px; } .overlay-score { font-size: 18px; } .btn-play { font-size: 15px; padding: 12px 24px; } .ability-indicator { bottom: 70px; padding: 8px 16px; font-size: 13px; } .settings-panel { padding: 16px; } .setting-row { font-size: 13px; padding: 8px 10px; } .setting-btn { min-width: 70px; padding: 6px 10px; font-size: 12px; } .pill { padding: 6px 10px; font-size: 12px; gap: 4px; } .pill .icon { font-size: 14px; } #score { font-size: 13px; } .controls { bottom: 10px; right: 10px; } .controls button.btn { padding: 8px 10px; font-size: 11px; } .news-card { padding: 14px; } .news-version { font-size: 18px; } }
+#rotateMsg { display: none; position: absolute; inset: 0; z-index: 9999; background: #0a0e27; color: #fff; flex-direction: column; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; text-align: center; gap: 16px; padding: 20px; }
+    #rotateMsg span { font-size: 64px; }
+    @media (orientation: portrait) and (max-width: 700px) { #rotateMsg { display: flex; } }
+    .levels-screen, .settings-screen, .menu-screen { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .settings-screen { justify-content: flex-start !important; padding: 80px 0 20px; }
+    @media (max-height: 500px) {
+        .pill { padding: 6px 14px; font-size: 13px; } .hud { top: 8px; } button.btn { padding: 8px 14px; font-size: 13px; } .controls { bottom: 8px; right: 8px; } .hazard-indicator { top: 48px; } .ability-indicator { bottom: 60px; padding: 8px 16px; }
+        .menu-title { font-size: 40px; } .menu-subtitle { font-size: 12px; margin-bottom: 12px; } .menu-buttons { gap: 8px; } .menu-btn { padding: 8px 20px; font-size: 15px; }
+        .overlay-card { padding: 14px 28px; } .overlay-title { font-size: 28px; margin-bottom: 4px; } .overlay-stars { font-size: 30px; margin: 6px 0 8px; } .overlay-score { margin-bottom: 12px; } .btn-play { padding: 10px 22px; font-size: 15px; }
+    }
 </style>
 </head>
 <body>
 <div id="gameWrap">
+    <div id="rotateMsg"><span>📱↻</span>Поверни телефон горизонтально</div>
     <canvas id="gameCanvas"></canvas>
     <div id="fps-counter">FPS: 60</div>
     <div class="hud" id="hud" style="display:none;">
@@ -98,6 +109,7 @@
     <div class="hazard-indicator" id="hazardIndicator"></div>
     <div class="ability-indicator" id="abilityIndicator"><span id="abilityIcon">⚡</span><span id="abilityText">Клик!</span></div>
     <div class="controls" id="controls" style="display:none;">
+        <button class="btn btn-menu" id="fsBtn">⛶</button>
         <button class="btn btn-menu" id="menuBtn">☰ Меню</button>
         <button class="btn btn-restart" id="restartBtn">🔄 Заново</button>
     </div>
@@ -196,10 +208,10 @@
 (function() {
 'use strict';
 
-const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
 const isLowEnd = isMobile || navigator.hardwareConcurrency <= 4;
 const MAX_PARTICLES = isLowEnd ? 80 : 200;
-const MAX_DPR = isLowEnd ? 1 : Math.min(2, window.devicePixelRatio || 1);
+const MAX_DPR = Math.min(isLowEnd ? (navigator.hardwareConcurrency > 4 ? 1.5 : 1) : 2, window.devicePixelRatio || 1);
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d', { alpha: false });
@@ -209,10 +221,10 @@ function resizeCanvas() {
     const dpr = MAX_DPR;
     canvas.width = W * dpr; canvas.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const s = Math.min(window.innerWidth / W, window.innerHeight / H) * 0.96;
+    const s = Math.min(window.innerWidth / W, window.innerHeight / H) * (isMobile ? 1 : 0.96);
     canvas.style.width = (W * s) + 'px'; canvas.style.height = (H * s) + 'px';
 }
-window.addEventListener('resize', resizeCanvas); resizeCanvas();
+window.addEventListener('resize', resizeCanvas); window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 250)); resizeCanvas();
 
 const $ = id => document.getElementById(id);
 const scoreEl = $('score'), levelNameHud = $('levelNameHud'), hud = $('hud'), controls = $('controls'), hint = $('hint');
@@ -230,7 +242,7 @@ const creditsScreen = $('creditsScreen'), creditsBackBtn = $('creditsBackBtn');
 const fpsCounter = $('fps-counter');
 
 const CURRENT_VERSION = '1.5.0', SAVE_KEY = 'angryBirds_ultimate_v135', SETTINGS_KEY = 'angryBirds_settings_v135', VERSION_KEY = 'angryBirds_lastSeenVersion';
-const GRAVITY = 0.42, GROUND_Y = H - 78, MAX_PULL = 140, LAUNCH_MULT = 0.30, PHYS_SUBSTEPS = isLowEnd ? 4 : 8;
+const GRAVITY = 0.42, GROUND_Y = H - 78, MAX_PULL = 140, LAUNCH_MULT = 0.30, PHYS_SUBSTEPS = isLowEnd ? 3 : 6;
 
 let settings = { music: true, sound: true, perfectPhysics: true, highGraphics: !isLowEnd, showFps: false };
 let saveData = { levels: {}, achievements: {}, stats: { birds: 0, pigs: 0, blocks: 0, abilities: 0, drowned: 0 } };
@@ -249,7 +261,7 @@ function loadSave() { try { const r = localStorage.getItem(SAVE_KEY); if (r) { s
 function saveGame() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(saveData)); } catch(e) {} }
 
 let audioCtx = null, musicTimer = null;
-function ensureAudio() { if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} } }
+function ensureAudio() { if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} } if (audioCtx && audioCtx.state === 'suspended') { try { audioCtx.resume(); } catch(e) {} } }
 function beep(f, d, t='sine', v=0.15, s=null) {
     if (!settings.sound || !audioCtx) return;
     try { const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime); if (s) o.frequency.exponentialRampToValueAtTime(s, audioCtx.currentTime + d); g.gain.setValueAtTime(v, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + d); o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + d); } catch(e) {}
@@ -676,7 +688,7 @@ function getMouse(e) { const rect = canvas.getBoundingClientRect(), scaleX = W /
 function onDown(e) {
     ensureAudio(); if (state.phase === 'over' || state.phase === 'menu' || state.phase === 'victory' || state.gameEnded) return; const m = getMouse(e), now = performance.now();
     if (state.phase === 'flying') { const fb = birds.find(b => b.launched && !b.resting && !b.abilityUsed && b.type.ability && b.y < H && !b.inWater && !b.drowned); if (fb && now - lastAbilityTime > 300) { lastAbilityTime = now; if (fb.activateAbility()) { updateAbilityIndicator(); return; } } return; }
-    if (state.phase !== 'idle' || !bird || bird.launched) return; if (dist(m.x, m.y, bird.x, bird.y) < 80 || dist(m.x, m.y, slingshot.x, slingshot.y) < 80) { state.dragging = true; state.phase = 'aiming'; SFX.pull(); }
+    if (state.phase !== 'idle' || !bird || bird.launched) return; const grab = isMobile ? 170 : 90; if (dist(m.x, m.y, bird.x, bird.y) < grab || dist(m.x, m.y, slingshot.x, slingshot.y) < grab) { state.dragging = true; state.phase = 'aiming'; SFX.pull(); }
 }
 function onMove(e) { if (!state.dragging || !bird || state.phase === 'victory' || state.gameEnded) return; if (e.cancelable) e.preventDefault(); const m = getMouse(e); let dx = m.x - slingshot.x, dy = m.y - slingshot.y; if (dx > 0) dx = 0; const d = Math.hypot(dx, dy); if (d > MAX_PULL) { dx = dx / d * MAX_PULL; dy = dy / d * MAX_PULL; } bird.x = slingshot.x + dx; bird.y = slingshot.y + dy; bird.angle = Math.atan2(-dy, -dx); }
 function onUp(e) {
@@ -689,7 +701,25 @@ canvas.addEventListener('mousedown', onDown); canvas.addEventListener('mousemove
 canvas.addEventListener('touchstart', (e) => { e.preventDefault(); onDown(e); }, { passive: false }); canvas.addEventListener('touchmove', (e) => { e.preventDefault(); onMove(e); }, { passive: false }); canvas.addEventListener('touchend', (e) => { e.preventDefault(); onUp(e); }, { passive: false }); canvas.addEventListener('touchcancel', (e) => { e.preventDefault(); onUp(e); }, { passive: false });
 
 let gamepadAiming = false;
+let gpPrev = [];
 function pollGamepad() {
+    const gp = Array.from(navigator.getGamepads ? navigator.getGamepads() : []).find(g => g && g.connected); if (!gp) return;
+    const bt = i => !!(gp.buttons[i] && gp.buttons[i].pressed), edge = i => bt(i) && !gpPrev[i], now = performance.now();
+    if (state.phase === 'menu') { if ((edge(0) || edge(9)) && menuScreen.classList.contains('show')) playBtn.click(); }
+    else if (overlay.classList.contains('show')) { if (edge(0)) (nextOverlayBtn.style.display !== 'none' ? nextOverlayBtn : playAgainBtn).click(); else if (edge(1)) overlayMenuBtn.click(); }
+    else {
+        if (edge(9) || edge(8)) menuBtn.click(); else if (edge(1) || edge(3)) restartBtn.click();
+        if (state.phase === 'flying' && bt(0) && now - lastAbilityTime > 300) { const fb = birds.find(b => b.launched && !b.resting && !b.abilityUsed && b.type.ability && !b.drowned); if (fb) { lastAbilityTime = now; fb.activateAbility(); updateAbilityIndicator(); } }
+        const x0 = gp.axes[0] || 0, y0 = gp.axes[1] || 0, dpx = (bt(15) ? 1 : 0) - (bt(14) ? 1 : 0), dpy = (bt(13) ? 1 : 0) - (bt(12) ? 1 : 0);
+        let ax = Math.abs(x0) > 0.2 ? x0 : dpx, ay = Math.abs(y0) > 0.2 ? y0 : dpy; const m = Math.hypot(ax, ay); if (m > 1) { ax /= m; ay /= m; }
+        if (bird && !bird.launched && !state.gameEnded && (state.phase === 'idle' || gamepadAiming)) {
+            if (gamepadAiming && (m <= 0.1 || edge(0))) { gamepadAiming = false; onUp(); }
+            else if (m > 0.1) { if (!gamepadAiming) { gamepadAiming = true; state.dragging = true; state.phase = 'aiming'; SFX.pull(); } const dx = Math.min(0, ax) * MAX_PULL, dy = ay * MAX_PULL; bird.x = slingshot.x + dx; bird.y = slingshot.y + dy; bird.angle = Math.atan2(-dy, -dx); }
+        }
+    }
+    gpPrev = gp.buttons.map(b => b.pressed);
+}
+function pollGamepadOld() {
     const gamepads = navigator.getGamepads ? navigator.getGamepads() : []; const gp = gamepads[0]; if (!gp) return;
     const now = performance.now(); if (state.phase === 'flying' && gp.buttons[0].pressed && now - lastAbilityTime > 300) { const fb = birds.find(b => b.launched && !b.resting && !b.abilityUsed && b.type.ability); if (fb) { lastAbilityTime = now; fb.activateAbility(); updateAbilityIndicator(); } }
     const stickX = gp.axes[0], stickY = gp.axes[1]; const dpadX = (gp.buttons[15].pressed ? 1 : 0) - (gp.buttons[14].pressed ? 1 : 0); const dpadY = (gp.buttons[13].pressed ? 1 : 0) - (gp.buttons[12].pressed ? 1 : 0); const ax = Math.abs(stickX) > 0.2 ? stickX : dpadX; const ay = Math.abs(stickY) > 0.2 ? stickY : dpadY;
@@ -779,6 +809,9 @@ if (lastSeen !== CURRENT_VERSION) {
 }
 
 requestAnimationFrame(gameLoop);
+const fsBtn = $('fsBtn'); if (!document.documentElement.requestFullscreen) fsBtn.style.display = 'none';
+fsBtn.addEventListener('click', () => { try { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().then(() => { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {}); }).catch(() => {}); } else document.exitFullscreen(); } catch (e) {} });
+document.addEventListener('visibilitychange', () => { if (document.hidden) stopMusic(); else if (settings.music && state.phase !== 'menu') startMusic(); });
 document.addEventListener('pointerdown', () => { ensureAudio(); if (settings.music) startMusic(); }, { once: true });
 })();
 </script>
